@@ -9,8 +9,10 @@ import DemoApprovalCard from './DemoApprovalCard';
 import DemoLedger from './DemoLedger';
 import DemoInbox from './DemoInbox';
 import DemoDial from './DemoDial';
-import DemoRuns from './DemoRuns';
-import DemoQueue from './DemoQueue';
+import DemoMonitor from './DemoMonitor';
+import DemoAgentQueue from './DemoAgentQueue';
+import DemoRecap from './DemoRecap';
+import DemoUsage from './DemoUsage';
 import DemoChat from './DemoChat';
 import DemoText from './DemoText';
 import DemoNumbers from './DemoNumbers';
@@ -74,8 +76,10 @@ export function Showcase() {
       <DemoLedger />
       <DemoInbox />
       <DemoDial />
-      <DemoRuns />
-      <DemoQueue />
+      <DemoMonitor />
+      <DemoAgentQueue />
+      <DemoRecap />
+      <DemoUsage />
       <DemoChat />
       <DemoText />
       <DemoNumbers />
