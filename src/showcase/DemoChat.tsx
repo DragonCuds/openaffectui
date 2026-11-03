@@ -18,7 +18,6 @@ export default function DemoChat() {
   const [msgs, setMsgs] = useState<Msg[]>([
     { id: 0, role: 'assistant', text: 'سلام! چه کمکی از من برمی‌آید؟' },
   ]);
-  const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const nextId = useRef(1);
   const replyIdx = useRef(0);
@@ -43,7 +42,6 @@ export default function DemoChat() {
 
   const send = (text: string) => {
     setMsgs((l) => [...l, { id: nextId.current++, role: 'user', text }]);
-    setDraft('');
     setSending(true);
     return reply();
   };
@@ -63,12 +61,12 @@ export default function DemoChat() {
             <li key={m.id} className={`demo-chat-msg demo-chat-${m.role}`}>
               <p className="demo-chat-bubble">{m.text}</p>
               {m.role === 'assistant' ? (
-                <MessageActions text={m.text} onRegenerate={() => regenerate(m.id)} onFeedback={() => {}} />
+                <MessageActions text={m.text} onRegenerate={() => regenerate(m.id)} />
               ) : null}
             </li>
           ))}
         </ul>
-        <ChatComposer value={draft} onChange={setDraft} onSend={send} sending={sending} maxLength={500} />
+        <ChatComposer onSend={(text) => { if (!sending) void send(text); }} />
       </div>
     </Section>
   );

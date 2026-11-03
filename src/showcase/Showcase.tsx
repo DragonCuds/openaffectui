@@ -14,7 +14,10 @@ import DemoAgentQueue from './DemoAgentQueue';
 import DemoRecap from './DemoRecap';
 import DemoUsage from './DemoUsage';
 import DemoChat from './DemoChat';
-import DemoText from './DemoText';
+import DemoComposer from './DemoComposer';
+import DemoMessageActions from './DemoMessageActions';
+import DemoToolCall from './DemoToolCall';
+import DemoDiff from './DemoDiff';
 import DemoNumbers from './DemoNumbers';
 import DemoRange from './DemoRange';
 import './showcase.css';
@@ -80,8 +83,11 @@ export function Showcase() {
       <DemoAgentQueue />
       <DemoRecap />
       <DemoUsage />
+      <DemoComposer />
       <DemoChat />
-      <DemoText />
+      <DemoMessageActions />
+      <DemoDiff />
+      <DemoToolCall />
       <DemoNumbers />
       <DemoRange />
       <Toaster />
