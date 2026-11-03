@@ -61,7 +61,7 @@
 .page-intro {
   display: flex; align-items: flex-start; gap: var(--s2); margin: var(--s2) 0 0; padding: var(--s3) var(--s4);
   border-radius: var(--radius-card); background: var(--soft); color: var(--muted);
-  font-size: var(--fs-md); line-height: 1.9; max-inline-size: 70ch;
+  font-size: var(--fs-md); line-height: 1.9; text-wrap: pretty;
   animation: title-in 0.7s var(--ease) 0.12s both;
 }
 .page-intro svg { flex: none; margin-block-start: 5px; opacity: 0.8; }
