@@ -1,0 +1,5 @@
+.kit-page { display: flex; flex-direction: column; }
+.kit-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.kit-stack { display: flex; flex-direction: column; gap: var(--s3); }
+.kit-big { font-size: 40px; font-weight: 600; }
+.kit-dot { display: inline-flex; align-items: center; gap: var(--s2); }
