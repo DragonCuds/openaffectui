@@ -21,6 +21,9 @@
 @import "./kpi.css";
 @import "./breakdown.css";
 @import "./confirm.css";
+@import "./otp.css";
+@import "./stepper.css";
+@import "./pricing.css";
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);

@@ -48,3 +48,7 @@ export { DateRangePicker } from './DateRangePicker';
 export { formatRangeFa, compareRangeOf, DEFAULT_PRESETS } from './DateRangePicker';
 export type { DateRange, CompareMode, DateRangePreset, DateRangePickerProps } from './DateRangePicker';
 export { toJalali, toGregorian, jalaliMonthLength, formatJalali } from './jalali';
+export { OtpInput } from './OtpInput';
+export { Stepper } from './Stepper';
+export { PricingPlans } from './PricingPlans';
+export type { PricingPlan } from './PricingPlans';

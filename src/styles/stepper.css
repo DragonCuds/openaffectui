@@ -1,0 +1,33 @@
+/* Stepper: dots with a joining line, or a row of small bars. */
+.stp { --stp-ease: cubic-bezier(0.22, 1, 0.36, 1); margin: 0; padding: 0; list-style: none; }
+.stp-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* dots */
+.stp-dots { display: flex; align-items: flex-start; justify-content: center; gap: 0; }
+.stp-item { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; gap: 6px; min-inline-size: 0; text-align: center; }
+.stp-item::before { /* line towards the next step; drawn from the item's start edge to the next dot */
+  content: ''; position: absolute; inset-block-start: 13px; inset-inline-start: calc(50% + 18px); inline-size: calc(100% - 36px); block-size: 2px; border-radius: 1px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+}
+.stp-item:last-child::before { display: none; }
+.stp-item[data-state='done']::before { background: var(--ok); transition: background-color 0.3s ease; }
+.stp-dot {
+  display: grid; place-items: center; inline-size: 28px; block-size: 28px; border-radius: 50%; flex: none;
+  background: var(--soft); color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s var(--stp-ease);
+}
+.stp-item[data-state='now'] .stp-dot { background: var(--text); color: var(--panel); transform: scale(1.08); }
+.stp-item[data-state='done'] .stp-dot { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.stp-name { color: var(--muted); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; transition: color 0.3s ease; }
+.stp-item[data-state='now'] .stp-name { color: var(--text); font-weight: 500; }
+
+/* bar */
+.stp-segs { display: flex; gap: 4px; }
+.stp-seg { flex: 1 1 0; block-size: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); transition: background-color 0.35s ease; }
+.stp-seg[data-state='done'] { background: var(--text); }
+.stp-seg[data-state='now'] { background: color-mix(in srgb, var(--text) 45%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .stp *, .stp *::before { transition: none !important; }
+  .stp-item[data-state='now'] .stp-dot { transform: none; }
+}

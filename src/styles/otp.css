@@ -1,0 +1,20 @@
+/* OTP input: one box per digit, written from scratch. Boxes are always left-to-right (a code reads like a number). */
+.otp { display: flex; justify-content: center; gap: 8px; }
+.otp-box {
+  inline-size: 100%; max-inline-size: 44px; block-size: 52px; min-inline-size: 0; padding: 0; border: 0; border-radius: 12px;
+  background: var(--soft); color: var(--text); font: inherit; font-size: 22px; font-weight: 500; text-align: center;
+  font-variant-numeric: tabular-nums; caret-color: var(--text);
+  box-shadow: 0 0 0 0 transparent;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.otp-box[data-filled] { background: color-mix(in srgb, var(--text) 9%, var(--soft)); transform: scale(1.04); }
+.otp-box:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.otp-box:disabled { opacity: 0.5; }
+.otp[data-invalid] .otp-box { background: color-mix(in srgb, var(--bad) 12%, var(--soft)); animation: otp-shake 0.32s ease; }
+@keyframes otp-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (pointer: coarse) { .otp-box { block-size: 56px; } }
+@media (prefers-reduced-motion: reduce) {
+  .otp-box { transition: none; }
+  .otp-box[data-filled] { transform: none; }
+  .otp[data-invalid] .otp-box { animation: none; }
+}

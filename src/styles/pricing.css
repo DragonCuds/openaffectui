@@ -1,0 +1,26 @@
+/* Pricing plans: cards in a responsive grid, no borders. */
+.prc { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.prc-card {
+  display: flex; flex-direction: column; gap: 6px; padding: 18px 16px 16px; border-radius: 16px;
+  background: var(--soft); color: var(--text);
+  animation: prc-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards; animation-delay: calc(var(--i, 0) * 70ms);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+@media (hover: hover) { .prc-card:hover { transform: translateY(-2px); } }
+.prc-card[data-current] { background: color-mix(in srgb, var(--text) 8%, var(--soft)); }
+.prc-card[data-featured] { box-shadow: 0 12px 32px -14px color-mix(in srgb, var(--accent, var(--text)) 40%, transparent); }
+.prc-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-block-size: 24px; }
+.prc-name { font-size: 16px; font-weight: 500; }
+.prc-tag { padding: 2px 8px; border-radius: 6px; background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); font-size: 12.5px; line-height: 1.6; white-space: nowrap; }
+.prc-price { font-size: 24px; font-weight: 600; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.prc-note { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.prc-feat { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; padding: 0; list-style: none; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+.prc-feat li { display: flex; align-items: flex-start; gap: 8px; }
+.prc-feat svg { flex: none; margin-block-start: 4px; color: var(--ok); }
+.prc-btn { margin-block-start: auto; align-self: stretch; justify-content: center; }
+@media (pointer: coarse) { .prc-btn { min-block-size: 44px; } }
+@keyframes prc-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .prc-card { animation: none; transition: none; }
+  .prc-card:hover { transform: none; }
+}
