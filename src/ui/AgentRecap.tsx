@@ -56,6 +56,17 @@ export type AgentRecapProps = {
   title?: string;
   locale?: string;
   className?: string;
+  /** Only shows what happened: cards have no action, undo or redo buttons */
+  readOnly?: boolean;
+  /** With readOnly: a «دیدن» button on every card; `label` renames it */
+  onOpen?: (event: RecapEvent) => void;
+  openLabel?: string;
+  /** Lanes to show, in order (default: all three). Counts in the header follow. */
+  lanes?: RecapKind[];
+  /** Other names for the lanes and the header counts */
+  laneLabels?: Partial<Record<RecapKind, string>>;
+  /** What an empty lane says */
+  laneEmpty?: Partial<Record<RecapKind, string>>;
 };
 
 type CardState = 'working' | 'resolved' | 'undone';
@@ -100,6 +111,7 @@ const LANES: { kind: RecapKind; label: string; Icon: typeof User; empty: string 
 export function AgentRecap({
   events, since, until, onAction, onUndo, onRedo, limit = 3, replay = 1800,
   title = 'وقتی نبودی', locale = 'fa-IR', className,
+  readOnly = false, onOpen, openLabel = 'دیدن', lanes: laneKinds, laneLabels, laneEmpty,
 }: AgentRecapProps) {
   const uid = useId();
   const rootRef = useRef<HTMLElement>(null);
@@ -109,6 +121,7 @@ export function AgentRecap({
 
   const nf = useCallback((n: number) => n.toLocaleString(locale), [locale]);
   const tf = useMemo(() => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false }), [locale]);
+  const df = useMemo(() => new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }), [locale]);
   const ff = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short' }), [locale]);
 
   /* ---- replay setup (decided once, on mount) ---- */
@@ -134,13 +147,17 @@ export function AgentRecap({
       .sort((a, b) => a.ms - b.ms);
     // hour lines
     const hours: number[] = [];
+    const long = u - s > 2 * 86400000; // more than two days: day lines and dates instead of hour lines and clock times
     const d = new Date(s);
-    d.setMinutes(0, 0, 0);
-    if (d.getTime() <= s) d.setHours(d.getHours() + 1);
-    while (d.getTime() < u && hours.length < 400) { hours.push((d.getTime() - s) / (u - s)); d.setHours(d.getHours() + 1); }
+    if (long) d.setHours(0, 0, 0, 0); else d.setMinutes(0, 0, 0);
+    const bump = () => (long ? d.setDate(d.getDate() + 1) : d.setHours(d.getHours() + 1));
+    if (d.getTime() <= s) bump();
+    while (d.getTime() < u && hours.length < 400) { hours.push((d.getTime() - s) / (u - s)); bump(); }
     const step = Math.max(1, Math.ceil(hours.length / 24));
-    return { s, u, items, hours: hours.filter((_, i) => i % step === 0) };
+    return { s, u, long, items, hours: hours.filter((_, i) => i % step === 0) };
   }, [events, since, until, now]);
+
+  const fmt = (ms: number) => (model.long ? df : tf).format(new Date(ms));
 
   if (initialIds.current === null) initialIds.current = new Set(model.items.map((i) => i.ev.id));
 
@@ -307,16 +324,18 @@ export function AgentRecap({
 
   const fullDate = (ms: number) => { try { return ff.format(new Date(ms)); } catch { return ''; } };
 
-  const lanes = LANES.map((l) => {
+  const shownKinds = laneKinds && laneKinds.length ? laneKinds : LANES.map((l) => l.kind);
+  const lanes = LANES.filter((l) => shownKinds.includes(l.kind)).sort((a, b) => shownKinds.indexOf(a.kind) - shownKinds.indexOf(b.kind)).map((l0) => {
+    const l = { ...l0, label: laneLabels?.[l0.kind] ?? l0.label, empty: laneEmpty?.[l0.kind] ?? l0.empty };
     const all = model.items.filter((i) => i.ev.kind === l.kind);
     return { ...l, all, shown: all.slice(0, Math.max(1, limit)) };
   });
 
-  const crumbs = [
-    { key: 'done', Icon: CircleCheck, n: sum.done, label: 'انجام‌شده' },
-    { key: 'needs', Icon: User, n: sum.needs, label: 'منتظر تو' },
-    { key: 'failed', Icon: TriangleAlert, n: sum.failed, label: 'ناموفق' },
-  ] as const;
+  const crumbs = ([
+    { key: 'done', Icon: CircleCheck, n: sum.done, label: laneLabels?.done ?? 'انجام‌شده' },
+    { key: 'needs', Icon: User, n: sum.needs, label: laneLabels?.needs ?? 'منتظر تو' },
+    { key: 'failed', Icon: TriangleAlert, n: sum.failed, label: laneLabels?.failed ?? 'ناموفق' },
+  ] as const).filter((c) => shownKinds.includes(c.key));
 
   return (
     <section
@@ -330,7 +349,7 @@ export function AgentRecap({
         <div className="ui-ar-headtext">
           <h2 className="ui-ar-title" id={`${uid}-h`}>{title}</h2>
           <p className="ui-ar-since">
-            <span>از ساعت <time dateTime={new Date(model.s).toISOString()} title={fullDate(model.s)}>{tf.format(new Date(model.s))}</time></span>
+            <span>{model.long ? 'از' : 'از ساعت'} <time dateTime={new Date(model.s).toISOString()} title={fullDate(model.s)}>{fmt(model.s)}</time></span>
             <span className="ui-ar-chip">{duration(model.u - model.s, nf)}</span>
           </p>
         </div>
@@ -388,12 +407,12 @@ export function AgentRecap({
           ))}
           <span className="ui-ar-cursor" data-on={chart ? '' : undefined} style={{ insetInlineStart: chart?.x ?? 0 }} />
           <div ref={tipRef} className="ui-ar-tip" data-on={activeItem ? '' : undefined}>
-            {tipItem ? `${tf.format(new Date(tipItem.ms))} · ${tipItem.ev.title}` : null}
+            {tipItem ? `${fmt(tipItem.ms)} · ${tipItem.ev.title}` : null}
           </div>
         </div>
         <div className="ui-ar-axis">
-          <span>{tf.format(new Date(model.s))}</span>
-          <span>{tf.format(new Date(model.u))}</span>
+          <span>{fmt(model.s)}</span>
+          <span>{fmt(model.u)}</span>
         </div>
       </div>
 
@@ -445,46 +464,56 @@ export function AgentRecap({
                         <span className="ui-ar-detail" title={ev.detail}>{ev.detail}</span>
                         {ev.count && ev.count > 1 ? <span className="ui-ar-chip ui-ar-n">{nf(ev.count)}</span> : null}
                         <time className="ui-ar-time" dateTime={new Date(it.ms).toISOString()} title={fullDate(it.ms)}>
-                          {tf.format(new Date(it.ms))}
+                          {fmt(it.ms)}
                         </time>
                       </div>
-                      <div className="ui-ar-foot">
-                        <div className="ui-ar-footin" key={view}>
-                          {view === 'idle' || view === 'working' ? (
-                            <>
-                              {view === 'working' ? <span className="ui-ar-working">در حال انجام…</span> : null}
-                              <span className="ui-ar-actions">
-                                {ev.kind === 'needs' ? (
-                                  <button
-                                    type="button" className="ui-ar-btn" data-ar-btn="review"
-                                    aria-disabled={view === 'working' || undefined}
-                                    aria-label={`بررسی: ${ev.title}`}
-                                    onClick={() => { if (view !== 'working') runReview(ev); }}
-                                  >بررسی</button>
-                                ) : null}
-                                <button
-                                  type="button" className="ui-ar-btn ui-ar-primary" data-ar-btn="primary"
-                                  aria-disabled={view === 'working' || undefined}
-                                  aria-label={`${primary}: ${ev.title}`}
-                                  onClick={() => { void runPrimary(ev); }}
-                                >
-                                  {view === 'working' ? <Loader2 size={13} strokeWidth={2} className="ui-ar-spin" aria-hidden="true" /> : null}
-                                  {primary}
-                                </button>
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="ui-ar-tag" data-tone={view === 'undone' ? 'muted' : 'ok'}>{tagText}</span>
-                              <button
-                                type="button" className="ui-ar-btn" data-ar-btn={view === 'undone' ? 'redo' : 'undo'}
-                                aria-label={`${view === 'undone' ? 'دوباره' : 'واگرد'}: ${ev.title}`}
-                                onClick={() => (view === 'undone' ? runRedo(ev) : runUndo(ev))}
-                              >{view === 'undone' ? 'دوباره' : 'واگرد'}</button>
-                            </>
-                          )}
+                      {readOnly ? (onOpen ? (
+                        <div className="ui-ar-foot">
+                          <div className="ui-ar-footin">
+                            <span className="ui-ar-actions">
+                              <button type="button" className="ui-ar-btn" aria-label={`${openLabel}: ${ev.title}`} onClick={() => onOpen(ev)}>{openLabel}</button>
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      ) : null) : (
+                      <div className="ui-ar-foot">
+                          <div className="ui-ar-footin" key={view}>
+                            {view === 'idle' || view === 'working' ? (
+                              <>
+                                {view === 'working' ? <span className="ui-ar-working">در حال انجام…</span> : null}
+                                <span className="ui-ar-actions">
+                                  {ev.kind === 'needs' ? (
+                                    <button
+                                      type="button" className="ui-ar-btn" data-ar-btn="review"
+                                      aria-disabled={view === 'working' || undefined}
+                                      aria-label={`بررسی: ${ev.title}`}
+                                      onClick={() => { if (view !== 'working') runReview(ev); }}
+                                    >بررسی</button>
+                                  ) : null}
+                                  <button
+                                    type="button" className="ui-ar-btn ui-ar-primary" data-ar-btn="primary"
+                                    aria-disabled={view === 'working' || undefined}
+                                    aria-label={`${primary}: ${ev.title}`}
+                                    onClick={() => { void runPrimary(ev); }}
+                                  >
+                                    {view === 'working' ? <Loader2 size={13} strokeWidth={2} className="ui-ar-spin" aria-hidden="true" /> : null}
+                                    {primary}
+                                  </button>
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="ui-ar-tag" data-tone={view === 'undone' ? 'muted' : 'ok'}>{tagText}</span>
+                                <button
+                                  type="button" className="ui-ar-btn" data-ar-btn={view === 'undone' ? 'redo' : 'undo'}
+                                  aria-label={`${view === 'undone' ? 'دوباره' : 'واگرد'}: ${ev.title}`}
+                                  onClick={() => (view === 'undone' ? runRedo(ev) : runUndo(ev))}
+                                >{view === 'undone' ? 'دوباره' : 'واگرد'}</button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </li>
                   );
                 })}

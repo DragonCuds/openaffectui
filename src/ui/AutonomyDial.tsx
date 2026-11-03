@@ -94,7 +94,7 @@ function Count({ n }: { n: number }) {
 
 export function AutonomyDial({
   title, subtitle, icon, value, onChange, levels = DEFAULT_DIAL_LEVELS, actions,
-  locked, defaultLocked, onLockedChange, labels, disabled = false, label,
+  locked, defaultLocked, onLockedChange, labels, disabled = false, lockable = true, label,
 }: {
   title: string;
   subtitle?: string;
@@ -110,6 +110,8 @@ export function AutonomyDial({
   onLockedChange?: (ids: string[]) => void;
   labels?: Partial<DialLabels>;
   disabled?: boolean;
+  /** False when the app cannot pin single actions: rows show only a fixed lock for the locked ones (default true) */
+  lockable?: boolean;
   /** Accessible name of the stops (defaults to the title) */
   label?: string;
 }) {
@@ -235,17 +237,21 @@ export function AutonomyDial({
                     {a.risk === 'risky' ? L.risky : L.destructive}
                   </span>
                 )}
-                <button
-                  type="button"
-                  className="dial-lock"
-                  aria-pressed={pin}
-                  aria-label={pin ? L.unlock(a.label) : L.lock(a.label)}
-                  title={pin ? L.unlockTitle : L.lockTitle}
-                  disabled={disabled}
-                  onClick={() => toggle(a.id)}
-                >
-                  {pin ? <Lock size={14} strokeWidth={1.8} aria-hidden="true" /> : <LockOpen size={14} strokeWidth={1.8} aria-hidden="true" />}
-                </button>
+                {lockable ? (
+                  <button
+                    type="button"
+                    className="dial-lock"
+                    aria-pressed={pin}
+                    aria-label={pin ? L.unlock(a.label) : L.lock(a.label)}
+                    title={pin ? L.unlockTitle : L.lockTitle}
+                    disabled={disabled}
+                    onClick={() => toggle(a.id)}
+                  >
+                    {pin ? <Lock size={14} strokeWidth={1.8} aria-hidden="true" /> : <LockOpen size={14} strokeWidth={1.8} aria-hidden="true" />}
+                  </button>
+                ) : pin ? (
+                  <span className="dial-lock" data-fixed="" role="img" aria-label={L.lock(a.label)} title={L.lockTitle}><Lock size={14} strokeWidth={1.8} aria-hidden="true" /></span>
+                ) : null}
               </div>
             );
           })}

@@ -74,6 +74,8 @@ export type AgentMonitorProps = {
   onRetry?: () => void;
   onOpenLog?: () => void;
   defaultFolded?: boolean;
+  /** False when the start time is not known: the running clock is left out (default true) */
+  clock?: boolean;
   /** Start with a step's info card open */
   defaultOpenId?: string;
   /** Persian copy – override any of it */
@@ -336,6 +338,7 @@ export function AgentMonitor({
   error,
   onAllow, onDecline, onPause, onResume, onCancel, onRetry, onOpenLog,
   defaultFolded = false,
+  clock: showClock = true,
   defaultOpenId,
   labels,
   className,
@@ -595,7 +598,8 @@ export function AgentMonitor({
         case 'failed': return { k: 'failed', node: <span className="mon-tag" data-tone="bad"><X size={14} strokeWidth={2} aria-hidden="true" />{L.failed}</span> };
         case 'cancelled': return { k: 'cancelled', node: <span className="mon-tag" data-tone="mute">{L.cancelled}</span> };
         case 'idle': return { k: 'idle', node: <span className="mon-tag" data-tone="mute">{L.idle}</span> };
-        default: return { k: 'clock', node: busy ? <span className="mon-shm mon-clock" dir="ltr">{clock(elapsed)}</span> : <span className="mon-clock" dir="ltr" data-still>{clock(elapsed)}</span> };
+        default: if (!showClock) return { k: 'state', node: <span className="mon-tag" data-tone="mute">{stateText}</span> };
+          return { k: 'clock', node: busy ? <span className="mon-shm mon-clock" dir="ltr">{clock(elapsed)}</span> : <span className="mon-clock" dir="ltr" data-still>{clock(elapsed)}</span> };
       }
     })();
     return (
@@ -688,7 +692,7 @@ export function AgentMonitor({
     }
   })();
 
-  const hasClock = state === 'running' || state === 'waiting' || state === 'paused' || state === 'failed';
+  const hasClock = showClock && (state === 'running' || state === 'waiting' || state === 'paused' || state === 'failed');
 
   const controls: { k: string; node: ReactNode } = (() => {
     if (state === 'running') {

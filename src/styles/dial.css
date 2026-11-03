@@ -143,3 +143,4 @@
 @media (prefers-reduced-motion: reduce) {
   .dial *, .dial { transition: none !important; animation: none !important; }
 }
+.dial-lock[data-fixed] { cursor: default; opacity: 1; pointer-events: none; }

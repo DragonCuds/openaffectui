@@ -41,11 +41,12 @@ export function AgentLedger({
   agent,
   pointAt,
   empty = 'هنوز کاری انجام نشده',
+  countLabel = 'تغییر',
   className,
 }: {
   entries: LedgerEntry[];
   /** `id` is the row clicked; `ids` is that row plus every reversible change that builds on it. */
-  onUndo: (id: string, ids: string[]) => void | Promise<void>;
+  onUndo?: (id: string, ids: string[]) => void | Promise<void>;
   /** When given, undone rows offer a «دوباره» button. */
   onRedo?: (id: string, ids: string[]) => void | Promise<void>;
   title?: string;
@@ -54,6 +55,8 @@ export function AgentLedger({
   /** Lights up a change and what builds on it, as if its Undo were pointed at. `null` = none. */
   pointAt?: string | null;
   empty?: string;
+  /** The word after the count in the header (default «تغییر») */
+  countLabel?: string;
   className?: string;
 }) {
   const [hot, setHot] = useState<string | null>(null);
@@ -94,7 +97,7 @@ export function AgentLedger({
   const active = pointAt !== undefined ? pointAt : hot;
   const point = new Map<string, Point>();
   const root = active ? byId.get(active) : undefined;
-  if (root && root.state === 'done' && !root.irreversible && !busy.has(root.id)) {
+  if (onUndo && root && root.state === 'done' && !root.irreversible && !busy.has(root.id)) {
     point.set(root.id, 'root');
     for (const d of dependentsOf(root.id)) point.set(d.id, d.irreversible ? 'cant' : 'also');
   }
@@ -145,7 +148,7 @@ export function AgentLedger({
         <h3 className="alc-title">{title}</h3>
         {agent ? <span className="alc-agent">{agent}</span> : null}
         <span className="alc-counts">
-          <span><b>{faNum(entries.length)}</b> تغییر</span>
+          <span><b>{faNum(entries.length)}</b> {countLabel}</span>
           {undone > 0 ? <span className="alc-undone-count"><b>{faNum(undone)}</b> برگردانده</span> : null}
         </span>
       </header>
@@ -161,7 +164,7 @@ export function AgentLedger({
               const pt = point.get(e.id);
               const dep = e.state === 'done' && !e.irreversible ? dependentsOf(e.id) : [];
               const ids = [e.id, ...dep.filter((d) => !d.irreversible).map((d) => d.id)];
-              const canUndo = e.state === 'done' && !e.irreversible;
+              const canUndo = e.state === 'done' && !e.irreversible && !!onUndo;
               const canRedo = e.state === 'undone' && !!onRedo;
               const redoIds = [e.id, ...entries.filter((d) => d.state === 'undone' && d.id !== e.id && d.dependsOn?.includes(e.id)).map((d) => d.id)];
               const pointProps = {
@@ -230,7 +233,7 @@ export function AgentLedger({
                               type="button"
                               className="alc-btn"
                               aria-label={`برگرداندن: ${e.title}${dep.length ? ` (${faNum(dep.length)} تغییر وابسته هم برگردانده می‌شود)` : ''}`}
-                              onClick={() => run(e.id, onUndo, ids)}
+                              onClick={() => run(e.id, onUndo!, ids)}
                               {...pointProps}
                             >
                               <Undo2 size={14} strokeWidth={1.9} aria-hidden="true" />
