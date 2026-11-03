@@ -1,0 +1,32 @@
+/* chat composer: soft rounded field, round send button, status and counter underneath */
+.composer { display: flex; flex-direction: column; gap: var(--s1); }
+.composer-row { display: flex; align-items: flex-end; gap: var(--s2); padding: var(--s2); background: var(--soft); border-radius: var(--radius-card); transition: opacity 0.2s var(--ease); }
+.composer-disabled .composer-row { opacity: 0.6; }
+.composer-input { flex: 1; min-inline-size: 0; box-sizing: border-box; min-block-size: 36px; max-block-size: calc(1.7em * 6 + var(--s2) * 2); padding: var(--s2) var(--s3); border: 0; border-radius: calc(var(--radius-card) - 4px); background: transparent; color: var(--text); font: inherit; font-size: var(--fs-md); line-height: 1.7; resize: none; overflow-y: auto; overscroll-behavior: contain; outline: none; }
+.composer-input::placeholder { color: var(--muted); }
+.composer-input:focus-visible { outline: 2px solid var(--ring); outline-offset: 0; }
+.composer-input:disabled { cursor: default; }
+.composer-send { flex: none; display: inline-flex; align-items: center; justify-content: center; inline-size: 40px; block-size: 40px; border: 0; border-radius: 999px; background: var(--primary); color: var(--on-primary); cursor: pointer; transition: opacity 0.2s var(--ease), background-color 0.2s var(--ease); }
+.composer-send svg { transform: scaleX(-1); } /* point the arrow along the RTL reading direction */
+.composer-send:hover:not(:disabled) { opacity: 0.86; }
+.composer-send:disabled { background: var(--soft-2); color: var(--muted); opacity: 0.7; cursor: default; }
+.composer-send:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.composer-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding-inline: var(--s3); min-block-size: 1.5em; font-size: var(--fs-sm); color: var(--muted); }
+.composer-status { line-height: 1.5; }
+.composer-count { margin-inline-start: auto; font-variant-numeric: tabular-nums; line-height: 1.5; }
+.composer-count-warn { color: var(--busy); }
+.composer-count-bad { color: var(--bad); }
+
+@media (prefers-reduced-motion: reduce) {
+  .composer-row, .composer-send { transition: none; }
+}
+
+/* showcase-only chat layout (used by DemoChat) */
+.demo-chat { display: flex; flex-direction: column; gap: var(--s3); }
+.demo-chat-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s3); }
+.demo-chat-msg { display: flex; flex-direction: column; gap: var(--s1); max-inline-size: 85%; }
+.demo-chat-user { align-self: flex-start; }
+.demo-chat-assistant { align-self: flex-end; }
+.demo-chat-bubble { margin: 0; padding: var(--s2) var(--s4); border-radius: var(--radius-card); font-size: var(--fs-md); line-height: 1.8; overflow-wrap: anywhere; white-space: pre-wrap; }
+.demo-chat-user .demo-chat-bubble { background: var(--primary); color: var(--on-primary); }
+.demo-chat-assistant .demo-chat-bubble { background: var(--soft); }

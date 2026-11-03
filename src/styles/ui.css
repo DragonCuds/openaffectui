@@ -10,6 +10,10 @@
 @import "./usage.css";
 @import "./queue.css";
 @import "./recap.css";
+@import "./composer.css";
+@import "./message-actions.css";
+@import "./diff.css";
+@import "./toolcall.css";
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);

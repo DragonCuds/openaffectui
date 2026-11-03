@@ -27,3 +27,8 @@ export { AgentQueue } from './AgentQueue';
 export type { QueueItem } from './AgentQueue';
 export { AgentRecap } from './AgentRecap';
 export type { RecapStat, RecapEvent } from './AgentRecap';
+export { ChatComposer } from './ChatComposer';
+export { MessageActions } from './MessageActions';
+export type { Feedback } from './MessageActions';
+export { InlineDiff } from './InlineDiff';
+export { ToolCallCard } from './ToolCallCard';

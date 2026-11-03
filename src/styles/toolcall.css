@@ -1,0 +1,27 @@
+/* tool call card: one soft row, details open below */
+.toolcall { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.toolcall-head { display: flex; align-items: center; gap: var(--s2); }
+.toolcall-title { flex: 1; min-inline-size: 0; font-size: var(--fs-md); font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
+.toolcall-state { flex: none; color: var(--muted); font-size: var(--fs-sm); }
+.toolcall-failed .toolcall-state { color: var(--bad); font-weight: 500; }
+.toolcall-time { flex: none; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.toolcall-toggle { display: inline-flex; align-items: center; gap: var(--s1); align-self: flex-start; padding: 2px var(--s2); border: 0; border-radius: 999px; background: none; color: var(--muted); font-size: var(--fs-sm); transition: background-color 0.2s var(--ease), color 0.2s var(--ease); }
+.toolcall-toggle:hover { background: var(--soft-2); color: var(--text); }
+.toolcall-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.toolcall-chev { transition: transform 0.3s var(--ease); }
+.toolcall-toggle[aria-expanded='true'] .toolcall-chev { transform: rotate(180deg); }
+.toolcall-body:not([hidden]) { animation: toolcall-in 0.3s var(--ease) both; }
+.toolcall-list { list-style: none; margin: 0; padding: var(--s2) var(--s3); display: flex; flex-direction: column; gap: var(--s1); background: var(--soft-2); border-radius: var(--radius-card); font-size: var(--fs-sm); line-height: 1.8; }
+.toolcall-list li { overflow-wrap: anywhere; }
+@keyframes toolcall-in { from { opacity: 0; transform: translateY(-4px); } }
+
+@media (max-width: 420px) {
+  .toolcall { padding: var(--s3); }
+  .toolcall-head { flex-wrap: wrap; }
+  .toolcall-title { flex-basis: 60%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolcall-chev, .toolcall-toggle { transition: none; }
+  .toolcall-body:not([hidden]) { animation: none; }
+}

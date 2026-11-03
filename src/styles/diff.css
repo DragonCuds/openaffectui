@@ -1,0 +1,20 @@
+/* inline diff: soft card, removed = struck through, added = tinted */
+.diff { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.diff-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2) var(--s3); }
+.diff-summary { color: var(--muted); font-size: var(--fs-sm); }
+.diff-text { font-size: var(--fs-md); line-height: 2; overflow-wrap: anywhere; }
+.diff-text-same { color: var(--muted); }
+.diff-del, .diff-add { text-decoration: none; border-radius: 4px; padding-inline: 2px; }
+.diff-del { color: var(--muted); background: color-mix(in srgb, var(--bad) 14%, transparent); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.diff-add { background: color-mix(in srgb, var(--ok) 22%, transparent); font-weight: 500; }
+.diff-tag { display: inline-block; margin-inline: var(--s1); padding: 0 6px; border-radius: 999px; background: var(--soft-2); color: var(--text); font-size: 0.7rem; font-weight: 500; line-height: 1.6; text-decoration: none; vertical-align: middle; }
+.diff-del .diff-tag { color: var(--bad); }
+.diff-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.diff-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2); }
+.diff-col { display: flex; flex-direction: column; gap: var(--s1); min-inline-size: 0; padding: var(--s3); background: var(--soft-2); border-radius: var(--radius-card); }
+.diff-col-title { color: var(--muted); font-size: var(--fs-sm); font-weight: 500; }
+
+@media (max-width: 560px) {
+  .diff { padding: var(--s3); }
+  .diff-split { grid-template-columns: 1fr; }
+}

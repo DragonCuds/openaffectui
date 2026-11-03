@@ -8,6 +8,8 @@ import DemoInbox from './DemoInbox';
 import DemoDial from './DemoDial';
 import DemoRuns from './DemoRuns';
 import DemoQueue from './DemoQueue';
+import DemoChat from './DemoChat';
+import DemoText from './DemoText';
 import './showcase.css';
 
 const GUARDS = [
@@ -66,6 +68,8 @@ export function Showcase() {
       <DemoDial />
       <DemoRuns />
       <DemoQueue />
+      <DemoChat />
+      <DemoText />
       <Toaster />
     </div>
   );
