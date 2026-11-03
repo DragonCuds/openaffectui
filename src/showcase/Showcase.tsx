@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Button, Meter, PageTitle, RollingNumber, Section, Segmented, StatusDot, Surface } from '../ui';
+import { Toaster } from '../ui/Toaster';
+import DemoToastSwap from './DemoToastSwap';
+import DemoLoaders from './DemoLoaders';
 import './showcase.css';
 
 const GUARDS = [
@@ -50,6 +53,10 @@ export function Showcase() {
       <Section title="سطح">
         <Surface><p>این یک کارت ساده است. متن فارسی، راست‌چین و با ارقام فارسی: ۱۲۳۴۵۶۷۸۹۰</p></Surface>
       </Section>
+
+      <DemoToastSwap />
+      <DemoLoaders />
+      <Toaster />
     </div>
   );
 }

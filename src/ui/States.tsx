@@ -1,0 +1,36 @@
+import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { Inbox, CircleAlert } from 'lucide-react';
+import { Button } from './Button';
+
+/** Placeholder blocks with a soft shimmer while a screen loads. */
+export function Skeleton({ rows = 3, height = 64 }: { rows?: number; height?: number }) {
+  return (
+    <div className="skel-stack" aria-busy="true" aria-label="در حال بارگذاری">
+      {Array.from({ length: rows }, (_, i) => <div className="skel" key={i} style={{ height }} />)}
+    </div>
+  );
+}
+
+/** Nothing here yet: an icon, a sentence, and optionally the next step. */
+export function EmptyState({ icon: Icon = Inbox, title, hint, action }: { icon?: LucideIcon; title: string; hint?: string; action?: ReactNode }) {
+  return (
+    <div className="empty">
+      <span className="empty-ic"><Icon size={22} strokeWidth={1.6} aria-hidden="true" /></span>
+      <p className="empty-title">{title}</p>
+      {hint ? <p className="muted">{hint}</p> : null}
+      {action}
+    </div>
+  );
+}
+
+/** A failed load, with a retry. */
+export function Notice({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <div className="empty" role="alert">
+      <span className="empty-ic bad"><CircleAlert size={22} strokeWidth={1.6} aria-hidden="true" /></span>
+      <p className="empty-title">{message}</p>
+      {onRetry ? <Button onClick={onRetry}>دوباره امتحان کن</Button> : null}
+    </div>
+  );
+}
