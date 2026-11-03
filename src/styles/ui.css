@@ -6,6 +6,10 @@
 @import "./inbox.css";
 @import "./decision.css";
 @import "./dial.css";
+@import "./monitor.css";
+@import "./usage.css";
+@import "./queue.css";
+@import "./recap.css";
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);

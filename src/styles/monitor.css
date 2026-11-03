@@ -1,0 +1,33 @@
+/* agent monitor: one soft run card */
+.monitor { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.monitor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s3); }
+.monitor-main { display: flex; flex-direction: column; gap: 2px; min-inline-size: 0; flex: 1; }
+.monitor-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
+.monitor-now { min-block-size: 1.7em; color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; overflow-wrap: anywhere; }
+.monitor-time { flex: none; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.monitor-count { color: var(--muted); font-size: var(--fs-sm); }
+.monitor-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s1); }
+.monitor-step { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); background: var(--soft-2); border-radius: var(--radius-card); font-size: var(--fs-md); transition: opacity 0.3s var(--ease), background 0.3s var(--ease); }
+.monitor-step-label { flex: 1; min-inline-size: 0; line-height: 1.7; overflow-wrap: anywhere; }
+.monitor-step-state { flex: none; color: var(--muted); font-size: var(--fs-sm); }
+.monitor-step-waiting { opacity: 0.6; }
+.monitor-step-active { font-weight: 500; }
+.monitor-step-failed .monitor-step-state { color: var(--bad); }
+.monitor-foot { display: flex; justify-content: flex-end; }
+.monitor-stop[aria-busy="true"] { opacity: 0.6; cursor: progress; }
+.monitor-stop:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.monitor-result { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); font-size: var(--fs-sm); }
+.monitor-result-failed { color: var(--bad); }
+
+@media (max-width: 420px) {
+  .monitor { padding: var(--s3); }
+  .monitor-head { flex-wrap: wrap; }
+  .monitor-step { flex-wrap: wrap; }
+  .monitor-step-state { margin-inline-start: auto; }
+  .monitor-foot { justify-content: stretch; }
+  .monitor-stop { inline-size: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monitor-step { transition: none; }
+}

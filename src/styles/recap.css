@@ -1,0 +1,29 @@
+/* agent recap: soft card, stat tiles that wrap, short event list */
+.recap { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.recap-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: var(--s2); }
+.recap-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.7; }
+.recap-period { color: var(--muted); font-size: var(--fs-sm); }
+.recap-stats { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.recap-stat { flex: 1 1 96px; display: flex; flex-direction: column; gap: 2px; padding: var(--s3); background: var(--soft-2); border-radius: var(--radius-card); }
+.recap-value { font-size: 1.5rem; font-weight: 600; line-height: 1.5; }
+.recap-label { color: var(--muted); font-size: var(--fs-sm); }
+.recap-stat-ok .recap-value { color: var(--ok); }
+.recap-stat-warn .recap-value { color: var(--busy); }
+.recap-stat-bad .recap-value { color: var(--bad); }
+.recap-events { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.recap-event { display: flex; align-items: baseline; gap: var(--s3); }
+.recap-when { flex: none; min-inline-size: 5ch; color: var(--muted); font-size: var(--fs-sm); }
+.recap-text { font-size: var(--fs-md); line-height: 1.7; overflow-wrap: anywhere; min-inline-size: 0; }
+.recap-dismiss { align-self: flex-start; min-block-size: 36px; padding-inline: var(--s4); border: 0; border-radius: 999px; background: var(--soft-2); color: inherit; font: inherit; font-size: var(--fs-md); cursor: pointer; transition: opacity 0.2s var(--ease); }
+.recap-dismiss:hover { opacity: 0.8; }
+.recap-dismiss:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+@media (max-width: 420px) {
+  .recap-stat { flex-basis: calc(50% - var(--s2)); }
+  .recap-event { flex-direction: column; gap: 0; }
+  .recap-dismiss { align-self: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recap-dismiss { transition: none; }
+}

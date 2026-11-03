@@ -1,0 +1,24 @@
+/* usage meter: soft card, bar tone follows level */
+.usage { --meter-fill: var(--text); display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3) var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.usage-warn { --meter-fill: var(--busy); --meter-opacity: 1; }
+.usage-bad { --meter-fill: var(--bad); --meter-opacity: 1; }
+.usage-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+.usage-label { font-size: var(--fs-md); font-weight: 500; line-height: 1.7; overflow-wrap: anywhere; }
+.usage-period { flex: none; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); }
+.usage-figures { line-height: 1.7; overflow-wrap: anywhere; }
+.usage-used { font-size: var(--fs-md); font-weight: 600; }
+.usage-limit { color: var(--muted); font-size: var(--fs-sm); }
+.usage-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s1) var(--s3); color: var(--muted); font-size: var(--fs-sm); }
+.usage-note { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); font-size: var(--fs-sm); }
+.usage-bad .usage-note { color: var(--bad); }
+.usage-empty { color: var(--muted); }
+.usage .meter-fill { transition: width 0.4s var(--ease), background 0.3s var(--ease); }
+
+@media (max-width: 420px) {
+  .usage { padding: var(--s3); }
+  .usage-head { flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .usage .meter-fill { transition: none; animation: none; }
+}
