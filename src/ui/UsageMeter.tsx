@@ -16,9 +16,9 @@ export type UsageState = 'ok' | 'warn' | 'limit';
 
 export type UsageMeterProps = {
   /** Credits included in the plan: the full width of the bar. */
-  total: number;
+  total?: number;
   /** What the credits went into in the shown period. */
-  used: UsagePart[];
+  used?: UsagePart[];
   /** Thin meters below (seats, storage...). No total (or null) = unlimited. */
   limits?: UsageLimit[];
   /** Options of the period switch; no switch when left out. */
@@ -235,12 +235,16 @@ function StateButton({ solid, label, onClick, reduce }: { solid: boolean; label:
 /* ---------- main component ---------- */
 
 export function UsageMeter({
-  total, used, limits = [], periods, period, defaultPeriod, onPeriodChange, resetAt, daily, onUpgrade,
+  total: totalProp, used: usedProp, limits = [], periods, period, defaultPeriod, onPeriodChange, resetAt, daily, onUpgrade,
   title = 'مصرف', plan, unit = 'اعتبار', warnAt = 0.8, upgradeLabel = 'ارتقا', topUpLabel = 'افزودن اعتبار', className, now,
 }: UsageMeterProps) {
   const reduce = useReducedMotion();
   const uid = useId();
   const rootRef = useRef<HTMLElement>(null);
+  /* no credit total = only the thin meters (counters with their own limits) */
+  const bare = totalProp === undefined;
+  const total = totalProp ?? 0;
+  const used = usedProp ?? [];
 
   /* period (controlled or not) */
   const [inner, setInner] = useState(defaultPeriod ?? periods?.[0]?.id ?? '');
@@ -404,6 +408,7 @@ export function UsageMeter({
       ref={rootRef}
       className={`um${className ? ` ${className}` : ''}`}
       data-state={state}
+      data-bare={bare || undefined}
       aria-labelledby={titleId}
       onKeyDown={(e) => { if (e.key === 'Escape') { setSeg(null); setDayIdx(null); } }}
     >
@@ -423,7 +428,7 @@ export function UsageMeter({
         ) : null}
       </div>
 
-      <div className="um-main">
+      {bare ? null : <div className="um-main">
         <div className="um-total">
           <span className="um-num">{fmt(Math.round(sumC))}</span>
           <span className="um-of">از {fmt(total)} {unit}</span>
@@ -546,7 +551,7 @@ export function UsageMeter({
             </div>
           </div>
         ) : null}
-      </div>
+      </div>}
 
       {limits.length > 0 ? (
         <div className="um-limits">
@@ -589,7 +594,7 @@ export function UsageMeter({
         </div>
       ) : null}
 
-      <div className="um-foot">
+      {bare ? null : <div className="um-foot">
         <p className="um-status" role="status" aria-live="polite">
           <span key={state} className="um-status-in" data-state={state}>
             {state !== 'ok' ? <i className="um-dot um-dot-on" aria-hidden="true" /> : null}
@@ -602,7 +607,7 @@ export function UsageMeter({
           reduce={reduce}
           onClick={() => onUpgrade?.(state)}
         />
-      </div>
+      </div>}
     </section>
   );
 }

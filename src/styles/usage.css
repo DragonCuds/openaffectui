@@ -180,6 +180,9 @@
   background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--text) 13%, var(--panel)) 0 4px, var(--um-track) 4px 8px);
 }
 
+/* only counters: no credit bar above, so no divider line and a little less air under the title */
+.um[data-bare] .um-limits { margin-block-start: 0; background-image: none; padding-block: 8px 18px; }
+
 /* ---------- footer ---------- */
 .um-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px;
