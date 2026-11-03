@@ -55,6 +55,17 @@
 .section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
 .section-head h2 { font-size: var(--fs-lg); font-weight: 600; }
 .section-aside { color: var(--muted); font-size: var(--fs-sm); }
+.section-hint { margin: 0; color: var(--muted); font-size: var(--fs-md); line-height: 1.8; max-inline-size: 62ch; }
+
+/* one plain sentence under a page title */
+.page-intro {
+  display: flex; align-items: flex-start; gap: var(--s2); margin: var(--s2) 0 0; padding: var(--s3) var(--s4);
+  border-radius: var(--radius-card); background: var(--soft); color: var(--muted);
+  font-size: var(--fs-md); line-height: 1.9; max-inline-size: 70ch;
+  animation: title-in 0.7s var(--ease) 0.12s both;
+}
+.page-intro svg { flex: none; margin-block-start: 5px; opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) { .page-intro { animation: none; } }
 
 .rn { display: inline-flex; direction: ltr; unicode-bidi: isolate; height: 1.5em; vertical-align: middle; line-height: 1.5; }
 .rn-cell { display: inline-block; width: 0.62em; height: 1.5em; overflow: hidden; text-align: center; }
