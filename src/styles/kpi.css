@@ -1,41 +1,121 @@
-/* kpi chart: soft card, big number, hand-drawn svg; bands instead of gridlines */
-.kpi { position: relative; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
-.kpi-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
-.kpi-empty { color: var(--muted); font-size: var(--fs-md); line-height: 1.7; }
-.kpi-headline { display: flex; align-items: baseline; gap: var(--s2); }
-.kpi-big { font-size: 2rem; font-weight: 700; line-height: 1.4; }
-.kpi-unit { color: var(--muted); font-size: var(--fs-md); }
-.kpi-change { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; align-self: flex-start; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; }
-.kpi-change svg { flex: none; color: var(--text); }
-.kpi-amount { direction: ltr; unicode-bidi: isolate; color: var(--text); font-weight: 600; }
+/* KPI Chart: look and motion copied from the public affectUI demo, written from scratch (Pro item, no vendor code). */
+.kpi {
+  --kpi-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --kpi-ring: color-mix(in srgb, var(--text) 7%, transparent);
+  --kpi-grid: color-mix(in srgb, var(--text) 7%, transparent);
+  --kpi-tick: color-mix(in srgb, var(--text) 48%, var(--panel));
+  --kpi-guide: color-mix(in srgb, var(--text) 18%, transparent);
+  --kpi-tip-bg: var(--panel);
+  --kpi-tip-shadow: 0 8px 24px rgb(0 0 0 / 0.09);
+  --kpi-up: color-mix(in srgb, var(--ok, #2f9e5f) 88%, var(--text));
+  --kpi-down: color-mix(in srgb, var(--bad, #d2453d) 90%, var(--text));
 
-.kpi-plot { position: relative; border-radius: var(--radius-card); touch-action: pan-y; cursor: crosshair; }
-.kpi-plot:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-.kpi-svg { display: block; inline-size: 100%; block-size: auto; overflow: visible; }
-.kpi-band { fill: var(--soft-2); opacity: 0.7; stroke: none; }
-.kpi-hit { fill: color-mix(in srgb, var(--primary) 10%, transparent); stroke: none; }
-.kpi-area { fill: color-mix(in srgb, var(--primary) 20%, transparent); stroke: none; animation: kpi-fade 0.8s var(--ease) both; }
-.kpi-line { fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: kpi-draw 1s var(--ease) both; }
-.kpi-dot { fill: var(--primary); }
-.kpi-halo { fill: color-mix(in srgb, var(--primary) 25%, transparent); }
-@keyframes kpi-draw { from { stroke-dashoffset: 1; } }
-@keyframes kpi-fade { from { opacity: 0; } }
-
-.kpi-tip { position: absolute; inset-block-start: 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 2px var(--s3); background: var(--panel); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); transform: translateX(50%); pointer-events: none; white-space: nowrap; line-height: 1.6; }
-.kpi-tip-label { color: var(--muted); font-size: var(--fs-sm); }
-.kpi-tip-value { font-size: var(--fs-md); font-weight: 600; }
-
-.kpi-axis { display: flex; justify-content: space-between; gap: var(--s3); color: var(--muted); font-size: var(--fs-sm); }
-.kpi-axis-one { justify-content: center; }
-.kpi-range { color: var(--muted); font-size: var(--fs-sm); }
-
-.kpi-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-
-@media (max-width: 420px) {
-  .kpi { padding: var(--s3); }
-  .kpi-big { font-size: 1.6rem; }
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 460px;
+  background: var(--panel);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--kpi-ring), var(--shadow-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+}
+:root[data-theme='dark'] .kpi {
+  --kpi-ring: color-mix(in srgb, var(--text) 9%, transparent);
+  --kpi-grid: color-mix(in srgb, var(--text) 9%, transparent);
+  --kpi-guide: color-mix(in srgb, var(--text) 24%, transparent);
+  --kpi-tip-bg: color-mix(in srgb, var(--panel) 90%, var(--text));
+  --kpi-tip-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+  --kpi-up: color-mix(in srgb, var(--ok, #4cc487) 92%, var(--text));
+  --kpi-down: color-mix(in srgb, var(--bad, #ef6a60) 92%, var(--text));
 }
 
+.kpi-body { padding: 16px 16px 16px; }
+.kpi-title { margin: 0; font-size: 15px; font-weight: 500; line-height: 20px; overflow-wrap: anywhere; }
+.kpi-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-block: 3px 10px; min-block-size: 40px; }
+.kpi-value { font-size: 32px; font-weight: 500; line-height: 40px; letter-spacing: -0.01em; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+.kpi-delta {
+  display: inline-flex; align-items: center; gap: 1px;
+  block-size: 22px; padding-inline: 8px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; line-height: 22px; white-space: nowrap; font-variant-numeric: tabular-nums;
+  background: color-mix(in srgb, var(--muted) 14%, transparent); color: var(--muted);
+}
+.kpi-delta[data-tone='up'] { background: color-mix(in srgb, var(--ok, #2f9e5f) 13%, transparent); color: var(--kpi-up); }
+.kpi-delta[data-tone='down'] { background: color-mix(in srgb, var(--bad, #d2453d) 12%, transparent); color: var(--kpi-down); }
+.kpi-sign { unicode-bidi: isolate; direction: ltr; }
+.kpi-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* plot */
+.kpi-plot {
+  position: relative; box-sizing: border-box; inline-size: 100%;
+  border-radius: 12px; cursor: crosshair; touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+}
+.kpi-plot:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+.kpi-svg { display: block; overflow: visible; }
+.kpi-grid { stroke: var(--kpi-grid); stroke-width: 1; shape-rendering: crispEdges; }
+.kpi-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* lines draw in from the first point (right in rtl): a clip that grows */
+.kpi-reveal {
+  transform-box: fill-box;
+  animation: kpi-reveal 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+@keyframes kpi-reveal { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* guide + dots + tooltip glide between points */
+.kpi-cursor { opacity: 0; transition: transform 0.2s var(--kpi-ease), opacity 0.16s ease; pointer-events: none; }
+.kpi-cursor[data-open] { opacity: 1; }
+.kpi-guide { fill: var(--kpi-guide); }
+.kpi-dot { stroke: var(--panel); stroke-width: 2; transition: transform 0.2s var(--kpi-ease); }
+
+.kpi-ytick, .kpi-xtick {
+  position: absolute; box-sizing: border-box; font-size: 12px; line-height: 16px;
+  color: var(--kpi-tick); white-space: nowrap; font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.kpi-ytick { inset-inline-start: 0; text-align: end; overflow: hidden; text-overflow: clip; }
+.kpi-xtick { overflow: hidden; text-overflow: ellipsis; }
+
+.kpi-empty {
+  position: absolute; inset-inline-start: 50%; inset-block-start: 56px; margin: 0; padding: 0 10px;
+  inline-size: max-content; max-inline-size: 80%; translate: 50% 0;
+  background: var(--panel); border-radius: 8px;
+  text-align: center; color: var(--muted); font-size: 14px; line-height: 24px; pointer-events: none;
+}
+:root[dir='ltr'] .kpi-empty, .kpi-empty:dir(ltr) { translate: -50% 0; }
+.kpi-plot[data-empty] { cursor: default; }
+
+/* tooltip */
+.kpi-tip {
+  position: absolute; inset-block-start: -1px; inset-inline-start: 0; z-index: 2;
+  min-inline-size: 160px; box-sizing: border-box; padding: 6px 10px 8px;
+  background: var(--kpi-tip-bg); border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--kpi-ring), var(--kpi-tip-shadow);
+  opacity: 0; pointer-events: none; will-change: transform;
+  transition: transform 0.22s var(--kpi-ease), opacity 0.16s ease;
+}
+/* positioned with a physical left/transform so it can glide; keep it left-anchored in rtl too */
+.kpi-tip { inset-inline-start: auto; left: 0; }
+.kpi-tip[data-open] { opacity: 1; }
+.kpi-tip-head { margin: 0; padding-block-end: 4px; font-size: 14px; font-weight: 500; line-height: 22px; white-space: nowrap; }
+.kpi-tip-rows { list-style: none; margin: 0; padding: 0; }
+.kpi-tip-row { display: flex; align-items: center; gap: 8px; block-size: 20px; font-size: 13px; line-height: 20px; white-space: nowrap; }
+.kpi-sw { flex: none; inline-size: 8px; block-size: 8px; border-radius: 2.5px; }
+.kpi-tip-k { flex: 1; min-inline-size: 0; color: color-mix(in srgb, var(--text) 70%, var(--panel)); padding-inline-end: 16px; overflow: hidden; text-overflow: ellipsis; }
+.kpi-tip-v { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* footer: a tinted band instead of a hairline */
+.kpi-foot {
+  margin: 0; padding: 8px 16px 10px; background: color-mix(in srgb, var(--text) 3%, transparent);
+  color: color-mix(in srgb, var(--text) 52%, var(--panel)); font-size: 13px; line-height: 20px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .kpi-plot { min-block-size: 40px; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .kpi-area, .kpi-line { animation: none; }
+  .kpi *, .kpi *::before, .kpi *::after { transition: none !important; animation: none !important; }
 }

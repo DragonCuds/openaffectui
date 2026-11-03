@@ -1,26 +1,121 @@
-/* change summary: soft card, one tinted row per metric; good/bad is icon + words, tint only supports it */
-.chg { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
-.chg-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.7; }
-.chg-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); }
-.chg-row { --chg-tone: var(--muted); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s1) var(--s3); padding: var(--s3); background: var(--soft-2); border-radius: var(--radius-card); }
-.chg-good { --chg-tone: var(--ok); }
-.chg-bad { --chg-tone: var(--bad); }
-.chg-label { grid-column: 1 / -1; font-size: var(--fs-md); font-weight: 500; line-height: 1.7; overflow-wrap: anywhere; }
-.chg-figures { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); min-inline-size: 0; line-height: 1.5; }
-.chg-num { font-size: var(--fs-lg); font-weight: 600; }
-.chg-before { color: var(--muted); font-weight: 500; }
-.chg-arrow { flex: none; color: var(--muted); }
-.chg-unit { color: var(--muted); font-size: var(--fs-sm); }
-.chg-delta { display: inline-flex; align-items: center; gap: 6px; padding: 2px var(--s2); border-radius: 999px; background: color-mix(in srgb, var(--chg-tone) 16%, transparent); color: var(--text); font-size: var(--fs-sm); line-height: 1.7; white-space: nowrap; }
-.chg-delta svg { flex: none; color: var(--chg-tone); }
-.chg-amount { direction: ltr; unicode-bidi: isolate; font-weight: 600; }
-.chg-meaning { color: var(--muted); }
-.chg-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.chg-empty-wrap { align-items: flex-start; }
-.chg-empty { color: var(--muted); font-size: var(--fs-md); line-height: 1.7; }
+/* Ported from affectUI Change Summary (MIT). Panel tokens, no 1px borders. */
 
-@media (max-width: 420px) {
-  .chg { padding: var(--s3); }
-  .chg-row { grid-template-columns: minmax(0, 1fr); }
-  .chg-delta { justify-self: start; white-space: normal; }
+.ui-cs {
+  --ui-cs-tray: var(--soft);
+  --ui-cs-card: var(--panel);
+  --ui-cs-ink: var(--text);
+  --ui-cs-muted: var(--muted);
+  --ui-cs-accent: var(--cs-accent, #3b82e6);
+  --ui-cs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  container-type: inline-size;
+  /* Like the Chat Composer: a gray tray with the heading, the white card sits on top of it */
+  background: var(--ui-cs-tray);
+  /* The gray tray frames the white card on every side */
+  padding: 6px;
+  border-radius: calc(var(--radius-card) + 6px);
+  font-family: var(--font, inherit);
+  color: var(--ui-cs-ink);
+  -webkit-font-smoothing: antialiased;
 }
+.ui-cs *, .ui-cs *::before, .ui-cs *::after { box-sizing: border-box; }
+
+.ui-cs__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 18px 10px;
+  font-size: 14px;
+  line-height: 20px;
+}
+.ui-cs__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-weight: 500;
+  color: var(--ui-cs-accent);
+}
+.ui-cs__icon { display: grid; place-items: center; flex: none; width: 16px; height: 16px; overflow: hidden; }
+/* A custom icon – an image too – fits the 16px tile */
+.ui-cs__icon > :is(img, svg) { display: block; width: 16px; height: 16px; object-fit: contain; }
+.ui-cs__title-text { min-width: 0; overflow-wrap: anywhere; }
+/* The period shortens before it squeezes the title */
+.ui-cs__period { flex: 0 1 auto; min-width: 0; max-width: 50%; overflow: hidden; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; color: var(--ui-cs-muted); }
+
+.ui-cs__card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  background: var(--soft-2);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+.ui-cs__row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 0 20px;
+  background: var(--ui-cs-card);
+  animation: ui-cs-in 520ms var(--ui-cs-ease) both;
+  transition: background-color 140ms ease;
+}
+.ui-cs__row:hover { background: color-mix(in srgb, var(--ui-cs-card) 94%, var(--text)); }
+.ui-cs__label {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  text-align: start;
+}
+.ui-cs__change {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ui-cs-muted);
+}
+/* The change keeps its numbers: it wraps up to three lines instead of being cut off */
+.ui-cs__text { display: -webkit-box; overflow: hidden; white-space: pre-line; overflow-wrap: anywhere; text-align: start; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+/* Narrow: each metric stacks above its change, so the text wraps instead of being cut off */
+@container (max-width: 400px) {
+  .ui-cs__row { grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 11px 16px; }
+  .ui-cs__label { white-space: normal; }
+  .ui-cs__change { align-items: flex-start; }
+}
+.ui-cs__trend {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+.ui-cs__trend[data-tone="good"] { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.ui-cs__trend[data-tone="bad"] { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.ui-cs__trend[data-tone="neutral"] { background: var(--soft); color: var(--muted); }
+
+@keyframes ui-cs-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-cs__row { animation: none; }
+}
+
+/* RTL: the trend arrows are vertical, so nothing to mirror; empty state */
+.ui-cs__empty { margin: 0; padding: 18px 20px; background: var(--ui-cs-card); font-size: 14px; line-height: 1.7; color: var(--ui-cs-muted); }
+.ui-cs__title { color: var(--ui-cs-accent); }
+:root[data-theme='dark'] .ui-cs { --ui-cs-accent: var(--cs-accent, #5b9bff); }

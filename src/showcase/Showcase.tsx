@@ -18,7 +18,9 @@ import DemoComposer from './DemoComposer';
 import DemoMessageActions from './DemoMessageActions';
 import DemoToolCall from './DemoToolCall';
 import DemoDiff from './DemoDiff';
-import DemoNumbers from './DemoNumbers';
+import DemoChange from './DemoChange';
+import DemoKpi from './DemoKpi';
+import DemoBreakdown from './DemoBreakdown';
 import DemoRange from './DemoRange';
 import './showcase.css';
 
@@ -88,7 +90,9 @@ export function Showcase() {
       <DemoMessageActions />
       <DemoDiff />
       <DemoToolCall />
-      <DemoNumbers />
+      <DemoChange />
+      <DemoKpi />
+      <DemoBreakdown />
       <DemoRange />
       <Toaster />
     </div>

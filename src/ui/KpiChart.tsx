@@ -1,168 +1,340 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
-import { RollingNumber } from './RollingNumber';
-import { faNum } from './digits';
+/*
+ * KPI Chart. Written from scratch to match the look and motion of the public affectUI "KPI Chart" demo
+ * (https://www.affectui.com/components/kpi-chart). No vendor code was used: sizes, colours and timings
+ * were read from the public demo like a user would (screenshots / frame captures) and the API follows its public docs.
+ * Reads in the page direction: in RTL the first point sits on the right and the lines draw in from the right.
+ */
+import {
+  useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState,
+  type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent,
+} from 'react';
 
-export type KpiPoint = { label: string; value: number };
+export type KpiSeries = { label: string; color: string; values: number[] };
 
-const W = 600;
-const H = 220;
-const PAD_X = 18;
-const PAD_T = 20;
-const PAD_B = 16;
+export type KpiChartProps = {
+  /** Label above the number. */
+  title?: string;
+  /** Headline value, already formatted. */
+  value?: string;
+  /** Change against the previous period: green when positive, red when negative. */
+  delta?: number;
+  /** One label per point; first, middle and last are shown on the axis. */
+  labels: string[];
+  /** Longer labels for the tooltip header; falls back to `labels`. */
+  tooltipLabels?: string[];
+  /** Lines: a label, a color and one value per label. */
+  series: KpiSeries[];
+  /** Formats axis, tooltip and delta values (default: compact, Persian digits). */
+  format?: (n: number) => string;
+  /** Line under the chart. */
+  footer?: string;
+  /** Point that stays highlighted while nobody hovers. */
+  defaultIndex?: number;
+  /** Quiet text in the plot when there are no values, or only zeros. */
+  emptyText?: string;
+  className?: string;
+};
 
-/** A small hand-drawn chart for one number over time. Reads right to left (first point on the right); pointer or arrow keys show each value. */
-export function KpiChart({ title, points, unit, kind = 'area' }: {
-  title: string;
-  points: KpiPoint[];
-  unit?: string;
-  kind?: 'line' | 'area';
-}) {
+/* ---------- geometry (css px, taken from the demo) ---------- */
+
+const PLOT_TOP = 8;      // room above the top grid line
+const PLOT_H = 124;      // top grid line to the zero line
+const SVG_H = PLOT_TOP + PLOT_H + 4;
+const AXIS_H = 20;
+const BLOCK_H = SVG_H + AXIS_H;
+const GAP = 14;          // guide to tooltip
+const FALLBACK = ['#2f6bff', '#ec4899', '#8b5cf6', '#14b8a6', '#a3a3a3'];
+
+const defaultFormat = (n: number): string =>
+  new Intl.NumberFormat('fa-IR', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+
+const STEPS = [1, 1.2, 1.5, 2, 2.4, 3, 4, 5, 6, 8, 10];
+function niceMax(v: number): number {
+  if (!(v > 0)) return 1;
+  const mag = 10 ** Math.floor(Math.log10(v));
+  for (const s of STEPS) if (s * mag >= v * 0.9999) return s * mag;
+  return 10 * mag;
+}
+
+const safeId = (s: string) => s.replace(/[^a-zA-Z0-9_-]/g, '');
+
+/* ---------- component ---------- */
+
+export function KpiChart({
+  title, value, delta, labels, tooltipLabels, series, format = defaultFormat,
+  footer, defaultIndex, emptyText = 'هنوز داده‌ای نیست', className,
+}: KpiChartProps) {
+  const uid = safeId(useId());
   const plotRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState<number | null>(null);
-  const n = points.length;
-  const suffix = unit ? ` ${unit}` : '';
+  const tipRef = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(388);
+  const [rtl, setRtl] = useState(true);
+  const [tipW, setTipW] = useState(160);
+  const [hover, setHover] = useState<number | null>(null);
+  const [kb, setKb] = useState<number | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+  const [shown, setShown] = useState(0); // where the guide, dots and tooltip are parked (they glide from here)
+  const touchRef = useRef(false);
 
-  if (n === 0) {
-    return (
-      <div className="kpi">
-        <p className="kpi-title">{title}</p>
-        <p className="kpi-empty">هنوز داده‌ای برای نمایش نیست.</p>
-      </div>
-    );
-  }
+  const n = labels.length;
+  const lines = useMemo(() => series.map((s, i) => ({
+    ...s, color: s.color || FALLBACK[i % FALLBACK.length],
+    values: Array.from({ length: n }, (_, k) => (Number.isFinite(s.values[k]) ? s.values[k] : 0)),
+  })), [series, n]);
 
-  const values = points.map((p) => p.value);
-  const lo = Math.min(...values);
-  const hi = Math.max(...values);
-  const span = hi - lo;
-  const yMin = span === 0 ? lo - 1 : lo - span * 0.12;
-  const yMax = span === 0 ? hi + 1 : hi + span * 0.12;
-  const x = (i: number) => (n === 1 ? W / 2 : W - PAD_X - (i / (n - 1)) * (W - 2 * PAD_X));
-  const y = (v: number) => PAD_T + (1 - (v - yMin) / (yMax - yMin)) * (H - PAD_T - PAD_B);
+  const all = lines.flatMap((s) => s.values);
+  const percent = /[%٪]/.test(format(0));
+  const empty = n === 0 || lines.length === 0 || all.length === 0 || (!percent && all.every((v) => v === 0));
 
-  const first = points[0];
-  const last = points[n - 1];
-  const delta = Math.round((last.value - first.value) * 10000) / 10000;
-  const dir: 'up' | 'down' | 'flat' = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-  const Icon = dir === 'up' ? TrendingUp : dir === 'down' ? TrendingDown : Minus;
-  const sign = dir === 'up' ? '+' : dir === 'down' ? '−' : '';
-  const pct = first.value !== 0 ? Math.round((Math.abs(delta) / Math.abs(first.value)) * 100) : null;
-  const word = dir === 'up' ? 'بیشتر شده' : dir === 'down' ? 'کمتر شده' : 'بدون تغییر';
+  /* scale */
+  const { min, max } = useMemo(() => {
+    if (empty) return { min: 0, max: 1 };
+    const hi = Math.max(0, ...all);
+    const lo = Math.min(0, ...all);
+    return { min: lo < 0 ? -niceMax(-lo) : 0, max: hi > 0 ? niceMax(hi) : lo < 0 ? 0 : 1 };
+  }, [all, empty]);
+  const ticks = [max, (max + min) / 2, min];
 
-  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)} ${y(p.value).toFixed(1)}`).join(' ');
-  const area = `${line} L${x(n - 1).toFixed(1)} ${H - PAD_B} L${x(0).toFixed(1)} ${H - PAD_B} Z`;
-
-  const shown = active !== null && active < n ? active : null;
-  const ap = shown !== null ? points[shown] : null;
-  const tipPos = shown !== null ? Math.min(86, Math.max(14, ((W - x(shown)) / W) * 100)) : 0;
-
-  const fromPointer = (e: PointerEvent<HTMLDivElement>) => {
+  /* size + direction */
+  useLayoutEffect(() => {
     const el = plotRef.current;
-    if (!el || n < 2) return;
-    const r = el.getBoundingClientRect();
-    if (r.width === 0) return;
-    const fromRight = ((r.right - e.clientX) / r.width) * W; // viewBox units from the right edge
-    const t = (fromRight - PAD_X) / (W - 2 * PAD_X);
-    setActive(Math.min(n - 1, Math.max(0, Math.round(t * (n - 1)))));
+    if (!el) return;
+    const measure = () => {
+      setW(el.clientWidth || 388);
+      setRtl(getComputedStyle(el).direction === 'rtl');
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const tickTexts = ticks.map((t) => format(t));
+  const gutter = empty ? 30 : Math.min(84, Math.max(30, Math.max(...tickTexts.map((t) => t.length)) * 6.6 + 12));
+  const plotL = rtl ? 0 : gutter;
+  const plotR = rtl ? W - gutter : W;
+  const plotW = Math.max(1, plotR - plotL);
+  const xAt = useCallback((i: number) => {
+    if (n <= 1) return (plotL + plotR) / 2;
+    const f = i / (n - 1);
+    return rtl ? plotR - f * plotW : plotL + f * plotW;
+  }, [n, plotL, plotR, plotW, rtl]);
+  const yAt = (v: number) => PLOT_TOP + PLOT_H * (1 - (v - min) / (max - min || 1));
+
+  /* active point: pointer, else keyboard, else the default one (Esc hides all of them) */
+  const dflt = defaultIndex != null && n > 0 ? Math.min(n - 1, Math.max(0, Math.round(defaultIndex))) : null;
+  const active = hover ?? kb ?? (dismissed ? null : dflt);
+  const act = active != null && active < n && !empty ? active : null;
+  useEffect(() => { if (act != null) setShown(act); }, [act]);
+  const at = Math.min(shown, Math.max(0, n - 1));
+
+  /* tooltip width (content changes with the point) */
+  useLayoutEffect(() => {
+    const w = tipRef.current?.offsetWidth;
+    if (w && Math.abs(w - tipW) > 0.5) setTipW(w);
+  });
+
+  /* touch: a tap outside lets the tooltip go */
+  useEffect(() => {
+    if (hover == null || !touchRef.current) return;
+    const off = (e: PointerEvent) => {
+      if (!plotRef.current?.contains(e.target as Node)) { setHover(null); touchRef.current = false; }
+    };
+    document.addEventListener('pointerdown', off);
+    return () => document.removeEventListener('pointerdown', off);
+  }, [hover]);
+
+  const indexAt = (clientX: number): number => {
+    const r = plotRef.current!.getBoundingClientRect();
+    const x = clientX - r.left;
+    if (n <= 1) return 0;
+    const f = (rtl ? plotR - x : x - plotL) / plotW;
+    return Math.min(n - 1, Math.max(0, Math.round(f * (n - 1))));
+  };
+
+  const onPointer = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (empty) return;
+    touchRef.current = e.pointerType === 'touch';
+    setDismissed(false);
+    setHover(indexAt(e.clientX));
+  };
+  const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    onPointer(e);
+    if (e.pointerType === 'touch') { try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ } }
+  };
+  const onLeave = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'touch') setHover(null);
   };
 
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    const cur = shown ?? (n - 1);
+    if (empty) return;
+    const cur = kb ?? (act ?? dflt ?? n - 1);
     let next: number | null = null;
-    // RTL: the first point sits on the right, so ArrowLeft goes forward in time
-    if (e.key === 'ArrowLeft') next = Math.min(n - 1, cur + 1);
-    else if (e.key === 'ArrowRight') next = Math.max(0, cur - 1);
-    else if (e.key === 'Home') next = 0;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const phys = e.key === 'ArrowRight' ? 1 : -1; // visual direction
+      next = cur + (rtl ? -phys : phys);
+    } else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = n - 1;
-    else if (e.key === 'Escape') { setActive(null); return; }
-    if (next === null) return;
+    else if (e.key === 'Escape') {
+      setKb(null); setHover(null); setDismissed(true);
+      return;
+    } else return;
     e.preventDefault();
-    setActive(next);
+    setDismissed(false);
+    setHover(null);
+    setKb(Math.min(n - 1, Math.max(0, next)));
+  };
+  const onFocus = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (empty || hover != null) return;
+    let vis = true;
+    try { vis = e.currentTarget.matches(':focus-visible'); } catch { /* old engines */ }
+    if (vis) { setDismissed(false); setKb(dflt ?? n - 1); }
   };
 
+  /* tooltip position (physical px from the plot's left edge) */
+  const gx = xAt(at);
+  const prefer: 'start' | 'end' = rtl ? 'start' : 'end'; // start = toward the left in rtl
+  let tx = prefer === 'end' ? gx + GAP : gx - GAP - tipW;
+  if (prefer === 'end' && tx + tipW > W + 8) tx = gx - GAP - tipW;
+  else if (prefer === 'start' && tx < -8) tx = gx + GAP;
+  tx = Math.max(-8, Math.min(W + 8 - tipW, tx));
+
+  const head = (tooltipLabels?.[at] ?? labels[at] ?? '');
+  const sorted = lines
+    .map((s, i) => ({ s, i, v: s.values[at] ?? 0 }))
+    .sort((a, b) => b.v - a.v || a.i - b.i);
+
+  /* axis labels: first, middle, last */
+  const axis: { i: number; mode: 'first' | 'mid' | 'last' }[] = [];
+  if (n >= 1) axis.push({ i: 0, mode: n === 1 ? 'mid' : 'first' });
+  if (n >= 3) axis.push({ i: Math.floor((n - 1) / 2), mode: 'mid' });
+  if (n >= 2) axis.push({ i: n - 1, mode: 'last' });
+
+  const axisStyle = (i: number, mode: 'first' | 'mid' | 'last'): CSSProperties => {
+    const x = xAt(i);
+    const atRight = (mode === 'first') === rtl; // does the label hang from its point toward the left?
+    if (mode === 'mid') return { left: x, transform: 'translateX(-50%)', maxInlineSize: plotW / 3 };
+    return atRight
+      ? { right: W - x, maxInlineSize: plotW / 2.4 }
+      : { left: x, maxInlineSize: plotW / 2.4 };
+  };
+
+  const paths = lines.map((s) => s.values.map((v, i) => `${i ? 'L' : 'M'}${xAt(i).toFixed(2)} ${yAt(v).toFixed(2)}`).join(''));
+  const sig = `${n}|${lines.map((s) => s.values.join(',')).join(';')}`;
+
+  const tone = delta == null ? null : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+  const sign = delta == null || delta === 0 ? '' : delta > 0 ? '+' : '−';
+  const summary = [title, value].filter(Boolean).join(': ');
+  const open = act != null;
+
   return (
-    <div className="kpi" dir="rtl">
-      <div className="kpi-head">
-        <p className="kpi-title">{title}</p>
-      </div>
-      <div className="kpi-headline">
-        <span className="kpi-big"><RollingNumber value={last.value} /></span>
-        {unit ? <span className="kpi-unit">{unit}</span> : null}
-      </div>
-      {n > 1 ? (
-        <p className={`kpi-change kpi-change-${dir}`}>
-          <Icon size={14} strokeWidth={1.8} aria-hidden="true" />
-          {dir !== 'flat' ? <bdi className="kpi-amount">{sign}{faNum(Math.abs(delta))}</bdi> : null}
-          {dir !== 'flat' && unit ? <span>{unit}</span> : null}
-          {pct !== null && dir !== 'flat' ? <span>({faNum(pct)}٪)</span> : null}
-          <span>{word} نسبت به «{first.label}»</span>
-        </p>
-      ) : (
-        <p className="kpi-change kpi-change-flat">فقط یک نقطه داده داریم؛ با داده‌ی بیشتر روند دیده می‌شود.</p>
-      )}
-
-      <div
-        className="kpi-plot"
-        ref={plotRef}
-        tabIndex={0}
-        role="group"
-        aria-roledescription="نمودار"
-        aria-label={`${title}. با کلیدهای چپ و راست میان نقطه‌ها حرکت کنید.`}
-        onPointerMove={fromPointer}
-        onPointerDown={fromPointer}
-        onPointerLeave={() => setActive(null)}
-        onKeyDown={onKey}
-        onFocus={(e) => { if (e.currentTarget === e.target && shown === null) setActive(n - 1); }}
-        onBlur={() => setActive(null)}
-      >
-        <svg className={`kpi-svg kpi-${kind}`} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
-          {[0, 1, 2, 3].map((b) => {
-            const bh = (H - PAD_T - PAD_B) / 4;
-            return b % 2 === 0 ? <rect key={b} className="kpi-band" x={0} y={PAD_T + b * bh} width={W} height={bh} /> : null;
-          })}
-          {shown !== null && n > 1 ? <rect className="kpi-hit" x={x(shown) - 14} y={0} width={28} height={H} rx={10} /> : null}
-          {n > 1 && kind === 'area' ? <path className="kpi-area" d={area} /> : null}
-          {n > 1 ? <path className="kpi-line" d={line} pathLength={1} /> : null}
-          {shown !== null ? (
-            <>
-              <circle className="kpi-halo" cx={x(shown)} cy={y(points[shown].value)} r={9} />
-              <circle className="kpi-dot" cx={x(shown)} cy={y(points[shown].value)} r={4.5} />
-            </>
-          ) : (
-            <circle className="kpi-dot" cx={x(n - 1)} cy={y(last.value)} r={4.5} />
-          )}
-        </svg>
-        {ap ? (
-          <div className="kpi-tip" style={{ insetInlineStart: `${tipPos}%` }} aria-hidden="true">
-            <span className="kpi-tip-label">{ap.label}</span>
-            <span className="kpi-tip-value">{faNum(ap.value)}{suffix}</span>
+    <div className={`kpi${className ? ` ${className}` : ''}`}>
+      <div className="kpi-body">
+        {title != null && <p className="kpi-title">{title}</p>}
+        {(value != null || tone) && (
+          <div className="kpi-head">
+            {value != null && <span className="kpi-value">{value}</span>}
+            {tone && delta != null && (
+              <span className="kpi-delta" data-tone={tone}>
+                {sign && <span className="kpi-sign" aria-hidden="true">{sign}</span>}
+                <span className="kpi-delta-n">{format(Math.abs(delta))}</span>
+                <span className="kpi-sr">{delta > 0 ? 'افزایش' : delta < 0 ? 'کاهش' : 'بدون تغییر'}</span>
+              </span>
+            )}
           </div>
-        ) : null}
-      </div>
+        )}
 
-      {n > 1 ? (
-        <div className="kpi-axis" aria-hidden="true">
-          <span>{first.label}</span>
-          <span>{last.label}</span>
-        </div>
-      ) : (
-        <p className="kpi-axis kpi-axis-one" aria-hidden="true">{first.label}</p>
-      )}
-      {n > 1 ? (
-        <p className="kpi-range">کمترین {faNum(lo)}{suffix} · بیشترین {faNum(hi)}{suffix}</p>
-      ) : null}
+        <div
+          ref={plotRef}
+          className="kpi-plot"
+          data-empty={empty || undefined}
+          style={{ blockSize: BLOCK_H }}
+          tabIndex={empty ? -1 : 0}
+          role="group"
+          aria-roledescription="نمودار"
+          aria-label={`${summary || 'نمودار شاخص'}. با کلیدهای چپ و راست بین نقطه‌ها بروید.`}
+          onPointerEnter={onPointer}
+          onPointerMove={onPointer}
+          onPointerDown={onDown}
+          onPointerLeave={onLeave}
+          onKeyDown={onKey}
+          onFocus={onFocus}
+          onBlur={() => setKb(null)}
+        >
+          <svg className="kpi-svg" width={W} height={SVG_H} viewBox={`0 0 ${W} ${SVG_H}`} aria-hidden="true">
+            <defs>
+              <clipPath id={`kc${uid}`}>
+                <rect
+                  key={sig}
+                  className="kpi-reveal"
+                  x={plotL - 4} y={0} width={plotW + 8} height={SVG_H}
+                  style={{ transformOrigin: rtl ? 'right' : 'left' } as CSSProperties}
+                />
+              </clipPath>
+            </defs>
+            {ticks.map((t, k) => (
+              <line key={k} className="kpi-grid" x1={plotL} x2={plotR} y1={yAt(t)} y2={yAt(t)} />
+            ))}
+            {!empty && (
+              <g clipPath={`url(#kc${uid})`}>
+                {lines.map((s, k) => (
+                  n === 1
+                    ? <circle key={k} cx={xAt(0)} cy={yAt(s.values[0])} r={3} fill={s.color} />
+                    : <path key={k} className="kpi-line" d={paths[k]} stroke={s.color} />
+                ))}
+              </g>
+            )}
+            {!empty && (
+              <g className="kpi-cursor" data-open={open || undefined} style={{ transform: `translateX(${gx}px)` }}>
+                <rect className="kpi-guide" x={-0.5} y={PLOT_TOP - 4} width={1} height={PLOT_H + 4} />
+                {lines.map((s, k) => (
+                  <circle
+                    key={k} className="kpi-dot" r={4.5} fill={s.color}
+                    style={{ transform: `translateY(${yAt(s.values[at] ?? 0)}px)` }}
+                  />
+                ))}
+              </g>
+            )}
+          </svg>
 
-      <p className="kpi-sr" role="status" aria-live="polite">{ap ? `${ap.label}: ${faNum(ap.value)}${suffix}` : ''}</p>
-      <table className="kpi-sr">
-        <caption>{title}</caption>
-        <thead><tr><th scope="col">بازه</th><th scope="col">مقدار{unit ? ` (${unit})` : ''}</th></tr></thead>
-        <tbody>
-          {points.map((p, i) => (
-            <tr key={i}><th scope="row">{p.label}</th><td>{faNum(p.value)}</td></tr>
+          {ticks.map((t, k) => (
+            <span key={k} className="kpi-ytick" style={{ top: yAt(t) - 8, inlineSize: gutter - 6 }} aria-hidden="true">
+              {empty && k === 1 ? '' : tickTexts[k]}
+            </span>
           ))}
-        </tbody>
-      </table>
+          {axis.map(({ i, mode }) => (
+            <span key={`${mode}${i}`} className="kpi-xtick" style={{ top: SVG_H, ...axisStyle(i, mode) }} aria-hidden="true">
+              {labels[i]}
+            </span>
+          ))}
+
+          {empty && <p className="kpi-empty">{emptyText}</p>}
+
+          {!empty && (
+            <div
+              ref={tipRef}
+              className="kpi-tip"
+              data-open={open || undefined}
+              style={{ transform: `translateX(${tx}px)`, maxInlineSize: Math.min(W + 16, 300) }}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <p className="kpi-tip-head">{head}</p>
+              <ul className="kpi-tip-rows">
+                {sorted.map(({ s, i, v }) => (
+                  <li key={i} className="kpi-tip-row">
+                    <i className="kpi-sw" style={{ background: s.color }} aria-hidden="true" />
+                    <span className="kpi-tip-k">{s.label}</span>
+                    <span className="kpi-tip-v">{format(v)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+      {footer != null && <p className="kpi-foot">{footer}</p>}
     </div>
   );
 }

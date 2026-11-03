@@ -38,11 +38,12 @@ export type { DiffSegment, InlineDiffHandle, InlineDiffProps } from './InlineDif
 export { ToolCallCard, ToolCallGroup } from './ToolCallCard';
 export type { ToolCallStatus, ToolCallCardProps, ToolCallGroupProps } from './ToolCallCard';
 export { ChangeSummary } from './ChangeSummary';
-export type { ChangeItem } from './ChangeSummary';
+export type { MetricChange, ChangeSummaryProps } from './ChangeSummary';
 export { KpiChart } from './KpiChart';
-export type { KpiPoint } from './KpiChart';
+export type { KpiSeries, KpiChartProps } from './KpiChart';
 export { CompactBreakdown } from './CompactBreakdown';
-export type { BreakdownPart } from './CompactBreakdown';
+export type { BreakdownItem, BreakdownPeriod, BreakdownPart, CompactBreakdownProps } from './CompactBreakdown';
 export { DateRangePicker } from './DateRangePicker';
-export type { DateRange } from './DateRangePicker';
+export { formatRangeFa, compareRangeOf, DEFAULT_PRESETS } from './DateRangePicker';
+export type { DateRange, CompareMode, DateRangePreset, DateRangePickerProps } from './DateRangePicker';
 export { toJalali, toGregorian, jalaliMonthLength, formatJalali } from './jalali';
