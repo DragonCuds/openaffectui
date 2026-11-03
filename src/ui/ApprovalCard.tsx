@@ -54,6 +54,10 @@ export interface ApprovalCardProps {
   expiresLabel?: string;
   /** Show the Ctrl+Enter / Esc hints on the buttons (the shortcuts work either way). */
   shortcuts?: boolean;
+  /** Turn the Ctrl+Enter / Esc keys off completely (for cards that write to a live site). */
+  keys?: boolean;
+  /** Let a long title and description wrap instead of cutting with «…». */
+  wrap?: boolean;
   /** Small label on the gray tray above the card, e.g. «مرحله‌ی ۴ · gmail.send». */
   label?: ReactNode;
   /** Where the buttons sit: «card» (last row of the card) or «tray» (gray tray below it). */
@@ -98,7 +102,7 @@ export function ApprovalCard(props: ApprovalCardProps) {
     alwaysLabel = 'همیشه اجازه بده', approveLabel = 'تأیید', denyLabel = 'رد', editLabel = 'ویرایش', undoLabel = 'لغو',
     pendingLabel = 'در حال انجام…', approvedLabel = 'تأیید شد', deniedLabel = 'رد شد', expiredLabel = 'منقضی شد',
     alwaysWord = 'همیشه', justNowLabel = 'همین الان', expiresLabel = 'مهلت',
-    shortcuts = true, label, actions = 'card', className,
+    shortcuts = true, keys = true, wrap = false, label, actions = 'card', className,
   } = props;
 
   const [own, setOwn] = useState<Status>(defaultStatus);
@@ -233,7 +237,7 @@ export function ApprovalCard(props: ApprovalCardProps) {
       <header className="apc-head">
         <span className="apc-tile" aria-hidden="true">{icon ?? <Shield size={16} strokeWidth={1.75} />}</span>
         <div className="apc-text">
-          <h3 className="apc-title" id={leave ? undefined : nameId}>{title}</h3>
+          <h3 className="apc-title" dir="auto" id={leave ? undefined : nameId}>{title}</h3>
           {description ? <p className="apc-desc" id={leave ? undefined : descId}>{description}</p> : null}
         </div>
         {risk ? (
@@ -319,7 +323,8 @@ export function ApprovalCard(props: ApprovalCardProps) {
       aria-describedby={[description ? descId : '', expiresIn ? expId : ''].filter(Boolean).join(' ') || undefined}
       aria-busy={busy || undefined}
       data-status={current}
-      onKeyDown={onKey}
+      data-wrap={wrap || undefined}
+      onKeyDown={keys ? onKey : undefined}
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}

@@ -132,3 +132,6 @@
   .idf *, .idf { transition-duration: 0.001ms !important; transition-delay: 0s !important; }
   .idf-pop > * { translate: 0 0; }
 }
+
+.idf-readonly .idf-bar, .idf-readonly .idf-pop { display: none; }
+.idf-readonly .idf-card { box-shadow: none; }

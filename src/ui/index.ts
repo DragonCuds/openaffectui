@@ -8,6 +8,7 @@ export { Meter } from './Meter';
 export { StatusDot } from './StatusDot';
 export type { Tone } from './StatusDot';
 export { Skeleton, EmptyState, Notice } from './States';
+export { ConfirmRow } from './ConfirmRow';
 export { ThinkingLoader } from './ThinkingLoader';
 export { Toaster, toast } from './Toaster';
 export { BlurSwap, BlurCrossfade } from './BlurSwap';

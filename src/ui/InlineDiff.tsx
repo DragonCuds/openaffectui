@@ -160,13 +160,15 @@ export type InlineDiffProps = {
   label?: string;
   /** Put the label on a gray tray above the card instead of inside it. */
   tray?: boolean;
+  /** Show the marked text only: no accept/reject bar or popover. */
+  readOnly?: boolean;
   /** Language of the built-in texts (decides nothing about the direction, which comes from the page). */
   lang?: Lang;
   className?: string;
   ref?: Ref<InlineDiffHandle>;
 };
 
-export function InlineDiff({ original = '', suggested = '', changes, onChange, onDone, label, tray = false, lang = 'fa', className, ref }: InlineDiffProps) {
+export function InlineDiff({ original = '', suggested = '', changes, onChange, onDone, label, tray = false, readOnly = false, lang = 'fa', className, ref }: InlineDiffProps) {
   const uid = useId();
   const T = STR[lang];
   const segs = useMemo(() => changes ?? diffWords(original, suggested), [changes, original, suggested]);
@@ -543,7 +545,7 @@ export function InlineDiff({ original = '', suggested = '', changes, onChange, o
   );
 
   return (
-    <div ref={root} className={['idf', tray ? 'idf-tray' : '', className].filter(Boolean).join(' ')} onKeyDown={onRootKey} data-has-active={activeCh ? '' : undefined}>
+    <div ref={root} className={['idf', tray ? 'idf-tray' : '', readOnly ? 'idf-readonly' : '', className].filter(Boolean).join(' ')} onKeyDown={onRootKey} data-has-active={activeCh ? '' : undefined} inert={readOnly || undefined}>
       {tray ? labelEl : null}
       {cardEl}
       <p className="idf-sr" role="status" aria-live="polite">{msg}</p>
