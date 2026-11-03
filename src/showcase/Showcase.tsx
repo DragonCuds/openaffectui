@@ -3,6 +3,9 @@ import { Button, Meter, PageTitle, RollingNumber, Section, Segmented, StatusDot,
 import { Toaster } from '../ui/Toaster';
 import DemoToastSwap from './DemoToastSwap';
 import DemoLoaders from './DemoLoaders';
+import DemoApproval from './DemoApproval';
+import DemoInbox from './DemoInbox';
+import DemoDial from './DemoDial';
 import './showcase.css';
 
 const GUARDS = [
@@ -56,6 +59,9 @@ export function Showcase() {
 
       <DemoToastSwap />
       <DemoLoaders />
+      <DemoApproval />
+      <DemoInbox />
+      <DemoDial />
       <Toaster />
     </div>
   );
