@@ -10,6 +10,8 @@ import DemoRuns from './DemoRuns';
 import DemoQueue from './DemoQueue';
 import DemoChat from './DemoChat';
 import DemoText from './DemoText';
+import DemoNumbers from './DemoNumbers';
+import DemoRange from './DemoRange';
 import './showcase.css';
 
 const GUARDS = [
@@ -70,6 +72,8 @@ export function Showcase() {
       <DemoQueue />
       <DemoChat />
       <DemoText />
+      <DemoNumbers />
+      <DemoRange />
       <Toaster />
     </div>
   );

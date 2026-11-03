@@ -1,0 +1,41 @@
+/* kpi chart: soft card, big number, hand-drawn svg; bands instead of gridlines */
+.kpi { position: relative; display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4); background: var(--soft); border-radius: var(--radius-card); }
+.kpi-title { font-size: var(--fs-md); font-weight: 600; line-height: 1.7; overflow-wrap: anywhere; }
+.kpi-empty { color: var(--muted); font-size: var(--fs-md); line-height: 1.7; }
+.kpi-headline { display: flex; align-items: baseline; gap: var(--s2); }
+.kpi-big { font-size: 2rem; font-weight: 700; line-height: 1.4; }
+.kpi-unit { color: var(--muted); font-size: var(--fs-md); }
+.kpi-change { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; align-self: flex-start; padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; }
+.kpi-change svg { flex: none; color: var(--text); }
+.kpi-amount { direction: ltr; unicode-bidi: isolate; color: var(--text); font-weight: 600; }
+
+.kpi-plot { position: relative; border-radius: var(--radius-card); touch-action: pan-y; cursor: crosshair; }
+.kpi-plot:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.kpi-svg { display: block; inline-size: 100%; block-size: auto; overflow: visible; }
+.kpi-band { fill: var(--soft-2); opacity: 0.7; stroke: none; }
+.kpi-hit { fill: color-mix(in srgb, var(--primary) 10%, transparent); stroke: none; }
+.kpi-area { fill: color-mix(in srgb, var(--primary) 20%, transparent); stroke: none; animation: kpi-fade 0.8s var(--ease) both; }
+.kpi-line { fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; animation: kpi-draw 1s var(--ease) both; }
+.kpi-dot { fill: var(--primary); }
+.kpi-halo { fill: color-mix(in srgb, var(--primary) 25%, transparent); }
+@keyframes kpi-draw { from { stroke-dashoffset: 1; } }
+@keyframes kpi-fade { from { opacity: 0; } }
+
+.kpi-tip { position: absolute; inset-block-start: 0; display: flex; flex-direction: column; align-items: center; gap: 0; padding: 2px var(--s3); background: var(--panel); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); transform: translateX(50%); pointer-events: none; white-space: nowrap; line-height: 1.6; }
+.kpi-tip-label { color: var(--muted); font-size: var(--fs-sm); }
+.kpi-tip-value { font-size: var(--fs-md); font-weight: 600; }
+
+.kpi-axis { display: flex; justify-content: space-between; gap: var(--s3); color: var(--muted); font-size: var(--fs-sm); }
+.kpi-axis-one { justify-content: center; }
+.kpi-range { color: var(--muted); font-size: var(--fs-sm); }
+
+.kpi-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (max-width: 420px) {
+  .kpi { padding: var(--s3); }
+  .kpi-big { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-area, .kpi-line { animation: none; }
+}
