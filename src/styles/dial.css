@@ -1,63 +1,145 @@
-/* AutonomyDial: stops sit at column centres; the rail spans first to last centre. */
-.dial { --sign: 1; --dial-tone: color-mix(in srgb, var(--busy) calc(var(--p) * 60%), var(--ok)); display: flex; flex-direction: column; gap: var(--s3); }
-.dial:dir(rtl) { --sign: -1; }
+/*
+ * AutonomyDial: card with a three-stop dial and the agent's actions gliding between two groups.
+ * Measured from the public affectUI demo (432px card, 26px stops, 9px gap, 32.5px rows).
+ * Rows, headings and notes are absolutely placed; JS only sets their translateY.
+ */
+.dial {
+  --dial-ring: color-mix(in srgb, var(--text) 10%, transparent);
+  --dial-seg: var(--soft);
+  --dial-seg-hover: color-mix(in srgb, var(--soft) 94%, var(--text));
+  --dial-seg-on: var(--panel);
+  --dial-seg-shadow: 0 0 0 1px var(--dial-ring), 0 1px 2px rgb(0 0 0 / 0.1);
+  --dial-quiet: color-mix(in srgb, var(--text) 50%, transparent);
+  --dial-seg-text: color-mix(in srgb, var(--text) 70%, transparent);
+  --dial-row-hover: color-mix(in srgb, var(--soft) 55%, transparent);
+  --dial-info: var(--info, #3c85e9);
+  --dial-risky-bg: #ffefd6;  --dial-risky-fg: #cc4e00;
+  --dial-bad-bg: #feebe7;    --dial-bad-fg: #dd4122;
+  --dial-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 432px;
+  background: var(--panel);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--dial-ring), var(--shadow-sm);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+:root[data-theme='dark'] .dial {
+  --dial-seg: var(--soft-2);
+  --dial-seg-hover: color-mix(in srgb, var(--soft-2) 92%, var(--text));
+  --dial-ring: color-mix(in srgb, var(--text) 12%, transparent);
+  --dial-seg-shadow: 0 0 0 1px var(--dial-ring), 0 1px 2px rgb(0 0 0 / 0.4);
+  --dial-row-hover: color-mix(in srgb, var(--soft-2) 55%, transparent);
+  --dial-risky-bg: #3b261a;  --dial-risky-fg: #ffa057;
+  --dial-bad-bg: #42201f;    --dial-bad-fg: #ff977d;
+}
 
-.dial-stops { position: relative; display: grid; grid-template-columns: repeat(var(--n), 1fr); }
-.dial-rail {
-  position: absolute; top: 15px; height: 4px; margin-block-start: -2px;
-  inset-inline: calc(50% / var(--n));
-  background: var(--soft-2); border-radius: 4px;
-  container-type: inline-size;
-}
-.dial-fill {
-  position: absolute; inset-block: 0; inset-inline-start: 0;
-  width: calc(var(--p) * 100%);
-  background: var(--dial-tone); opacity: 0.8; border-radius: 4px;
-  transition: width 0.45s var(--ease), background-color 0.45s var(--ease);
-}
-.dial-lane {
-  position: absolute; inset-inline-start: 0; top: 50%; width: 0; height: 0;
-  transform: translateX(calc(var(--sign) * var(--p) * 100cqw));
-  transition: transform 0.45s var(--ease);
-}
-.dial-thumb {
-  position: absolute; width: 20px; height: 20px; inset-inline-start: -10px; top: -10px;
-  border-radius: 50%; background: var(--panel); box-shadow: var(--shadow-sm), 0 0 0 4px var(--soft);
-}
-.dial-thumb::after {
-  content: ""; position: absolute; inset: 5px; border-radius: 50%;
-  background: var(--dial-tone); transition: background-color 0.45s var(--ease);
-}
+/* ---- header: title, subtitle, the stops ---- */
+.dial-top { padding: 18px 17px 20px; box-shadow: 0 1px 0 var(--soft); display: flex; flex-direction: column; gap: 15px; }
+.dial-id { display: flex; align-items: center; gap: 12px; }
+.dial-ico { flex: none; inline-size: 16px; display: grid; place-items: center; color: var(--dial-info); }
+.dial-spark { display: block; }
+.dial-text { min-inline-size: 0; }
+.dial-title { margin: 0; font: inherit; font-size: 15px; font-weight: 500; line-height: 20px; color: var(--text); }
+.dial-sub { margin: 0; font-size: 14px; line-height: 20px; color: var(--dial-quiet); }
 
+.dial-stops { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 9px; }
 .dial-stop {
-  position: relative; z-index: 1;
-  display: flex; flex-direction: column; align-items: center; gap: var(--s2);
-  padding: 0 var(--s1) var(--s1); border: 0; background: none; border-radius: var(--radius-card);
-  color: var(--muted); font-size: var(--fs-sm); line-height: 1.5; text-align: center;
-  transition: color 0.2s var(--ease);
+  min-block-size: 26px; padding: 3px 8px; border: 0; border-radius: 8px;
+  background: var(--dial-seg); color: var(--dial-seg-text);
+  font: inherit; font-size: 14px; font-weight: 500; line-height: 20px; text-align: center; cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
-.dial-stop[aria-checked="true"] { color: var(--text); font-weight: 600; }
-.dial-stop:hover:not(:disabled) { color: var(--text); }
+.dial-stop:hover:not(:disabled):not([data-on]) { background: var(--dial-seg-hover); }
+.dial-stop[data-on] { background: var(--dial-seg-on); color: var(--text); box-shadow: var(--dial-seg-shadow); }
 .dial-stop:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .dial-stop:disabled { cursor: default; }
-.dial-dot { width: 30px; height: 30px; display: grid; place-items: center; }
-.dial-dot::before {
-  content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--soft-2);
-  transition: background-color 0.3s var(--ease);
-}
-.dial-stop[data-on] .dial-dot::before { background: var(--dial-tone); }
-.dial-label { text-wrap: balance; overflow-wrap: anywhere; }
 
-.dial-hint {
-  margin: 0; padding: var(--s3) var(--s4); min-height: 3.2em;
-  background: var(--soft); border-radius: var(--radius-card);
-  color: var(--text); font-size: var(--fs-md); line-height: 1.8;
+/* ---- body: the two groups ---- */
+.dial-body { padding: 12px 11px; }
+.dial-list { position: relative; }
+.dial[data-ready] .dial-list { transition: height 0.38s var(--dial-ease) 0.06s; }
+
+.dial-head, .dial-empty, .dial-row { position: absolute; inset-inline: 0; top: 0; }
+.dial[data-ready] .dial-row { transition: transform 0.38s var(--dial-ease) 0.06s; }
+
+.dial-hb { display: flex; align-items: center; gap: 6px; }
+.dial-head {
+  block-size: 26px; padding-inline: 6px; display: flex; align-items: center; gap: 6px;
+  font-size: 14px; color: var(--dial-quiet);
 }
+.dial-count {
+  display: inline-grid; place-items: center; overflow: hidden; position: relative;
+  min-inline-size: 18px; block-size: 18px; padding-inline: 4px; border-radius: 5px;
+  background: var(--panel); box-shadow: 0 0 0 1px var(--dial-ring), 0 1px 1px rgb(0 0 0 / 0.04);
+  font-size: 12.5px; font-weight: 500; line-height: 1; color: color-mix(in srgb, var(--text) 62%, transparent);
+}
+.dial-num { grid-area: 1 / 1; font-variant-numeric: tabular-nums; }
+.dial-num[data-in] { animation: dial-num-in 0.3s var(--dial-ease) 0.08s both; }
+.dial-num[data-out] { animation: dial-num-out 0.14s ease-out both; }
+@keyframes dial-num-in { from { opacity: 0; transform: translateY(75%); } to { opacity: 1; transform: none; } }
+@keyframes dial-num-out { to { opacity: 0; transform: translateY(-65%); } }
+
+/* the heading of the lower group and the "nothing here" notes come back after every move */
+.dial-head[data-reveal] > .dial-hb, .dial-empty[data-reveal] > span { animation: dial-reveal 0.28s var(--dial-ease) 0.16s both; }
+@keyframes dial-reveal {
+  from { opacity: 0; transform: translateY(8px); clip-path: inset(55% 0 0 0); }
+  to { opacity: 1; transform: none; clip-path: inset(0); }
+}
+
+.dial-empty {
+  block-size: 36px; padding-block: 2px; display: grid; opacity: 0; pointer-events: none;
+}
+.dial-empty > span {
+  display: grid; place-items: center; border-radius: 8px; background: color-mix(in srgb, var(--soft) 70%, transparent);
+  font-size: 13.5px; color: var(--dial-quiet);
+}
+.dial-empty[data-show] { opacity: 1; }
+.dial[data-ready] .dial-empty { transition: opacity 0.2s ease; }
+
+/* ---- action rows ---- */
+.dial-row {
+  block-size: 32px; padding-inline: 6px 2px; border-radius: 8px;
+  display: flex; align-items: center; gap: 12px;
+  transition: background-color 0.15s ease;
+}
+.dial[data-ready] .dial-row { transition: transform 0.38s var(--dial-ease) 0.06s, background-color 0.15s ease; }
+.dial-row:hover, .dial-row:focus-within { background: var(--dial-row-hover); }
+.dial-aicon { flex: none; inline-size: 18px; block-size: 18px; display: grid; place-items: center; }
+.dial-aicon > svg { inline-size: 18px; block-size: 18px; }
+.dial-label { font-size: 15px; line-height: 20px; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dial-badge {
+  flex: none; margin-inline-start: -3px; block-size: 20px; padding-inline: 5px 6px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600; line-height: 1;
+  background: var(--dial-risky-bg); color: var(--dial-risky-fg);
+}
+.dial-badge[data-risk='destructive'] { background: var(--dial-bad-bg); color: var(--dial-bad-fg); }
+.dial-badge > svg { flex: none; }
+
+.dial-lock {
+  flex: none; margin-inline-start: auto; inline-size: 30px; block-size: 30px; padding: 0; border: 0; border-radius: 8px;
+  display: grid; place-items: center; background: none; cursor: pointer;
+  color: color-mix(in srgb, var(--text) 45%, transparent); opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.dial-row:hover .dial-lock, .dial-lock:focus-visible { opacity: 0.55; }
+.dial-row[data-pinned] .dial-lock { opacity: 1; }
+.dial-lock:hover:not(:disabled) { opacity: 1; background: color-mix(in srgb, var(--text) 9%, transparent); color: var(--text); }
+.dial-lock:focus-visible { opacity: 1; outline: 2px solid var(--ring); outline-offset: 0; }
+.dial-lock:disabled { cursor: default; }
+@media (hover: none) { .dial-lock { opacity: 0.55; } .dial-row[data-pinned] .dial-lock { opacity: 1; } }
+
 .dial[data-disabled] { opacity: 0.55; }
+.dial-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (max-width: 400px) {
-  .dial-stop { font-size: 12px; padding-inline: 0; }
+  .dial-stop { font-size: 13px; padding-inline: 4px; }
+  .dial-label { font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dial-fill, .dial-lane, .dial-thumb::after, .dial-dot::before, .dial-stop { transition: none; }
+  .dial *, .dial { transition: none !important; animation: none !important; }
 }

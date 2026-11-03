@@ -1,21 +1,200 @@
-/* agent ledger: stacked soft rows */
-.ledger { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); }
-.ledger-item { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s3) var(--s4); background: var(--soft); border-radius: var(--radius-card); transition: opacity 0.3s var(--ease); }
-.ledger-undone { opacity: 0.55; }
-.ledger-main { display: flex; flex-direction: column; gap: 2px; min-inline-size: 0; flex: 1; }
-.ledger-when { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: var(--fs-sm); }
-.ledger-title { font-size: var(--fs-md); font-weight: 500; line-height: 1.7; overflow-wrap: anywhere; }
-.ledger-detail { color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; overflow-wrap: anywhere; }
-.ledger-tag { align-self: flex-start; margin-block-start: var(--s1); padding: 2px var(--s2); border-radius: 999px; background: var(--soft-2); color: var(--muted); font-size: var(--fs-sm); }
-.ledger-tag-bad { color: var(--bad); }
-.ledger-undo { flex: none; }
-.ledger-undo:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+/* Agent ledger. Look and motion matched by eye from the public affectUI Agent Ledger demo (no code copied). */
+.alc {
+  --alc-blue: var(--info, #0058cf);
+  --alc-amber: #cc4e00;
+  --alc-ink-2: color-mix(in srgb, var(--text) 68%, transparent);
+  --alc-ink-3: color-mix(in srgb, var(--text) 52%, transparent);
+  --alc-ink-4: color-mix(in srgb, var(--text) 32%, transparent);
+  --alc-line: color-mix(in srgb, var(--text) 7%, transparent);
+  --alc-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  container-type: inline-size;
+  container-name: alc;
+  display: block;
+  color: var(--text);
+}
+:root[data-theme='dark'] .alc {
+  --alc-blue: var(--info, #8ab8ff);
+  --alc-amber: #ffb357;
+  --alc-ink-2: color-mix(in srgb, var(--text) 68%, transparent);
+}
 
-@media (max-width: 420px) {
-  .ledger-item { flex-wrap: wrap; align-items: flex-start; }
-  .ledger-undo { margin-inline-start: auto; }
+/* ---- header ---- */
+.alc-head { display: flex; align-items: center; gap: 8px; min-block-size: 20px; margin-block-end: 16px; padding-inline: 2px; }
+.alc-head-ic { flex: none; color: #3b84e8; }
+:root[data-theme='dark'] .alc-head-ic { color: #5b9bf0; }
+.alc-title { margin: 0; font-size: 14px; font-weight: 600; line-height: 20px; }
+.alc-agent { color: var(--alc-ink-3); font-size: 14px; line-height: 20px; }
+.alc-counts { margin-inline-start: auto; display: inline-flex; gap: 14px; color: var(--alc-ink-3); font-size: 13px; line-height: 20px; white-space: nowrap; }
+.alc-counts b { color: var(--text); font-weight: 600; }
+.alc-undone-count { animation: alc-fade 0.2s ease both; }
+
+/* ---- card ---- */
+.alc-card {
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 1px 3px rgb(0 0 0 / 0.04);
+}
+:root[data-theme='dark'] .alc-card { box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 10%, transparent); }
+.alc-list { list-style: none; margin: 0; padding: 0; }
+
+/* a new row opens its space first (the card grows), then fades in */
+.alc-item { display: grid; grid-template-rows: 1fr; }
+.alc-clip { min-block-size: 0; }
+.alc-item[data-new] { animation: alc-grow 0.28s var(--alc-ease) both; }
+.alc-item[data-new] .alc-clip { overflow: hidden; }
+.alc-item[data-new] .alc-row { animation: alc-fade 0.26s ease 0.1s both; }
+@keyframes alc-grow { from { grid-template-rows: 0fr; } to { grid-template-rows: 1fr; } }
+@keyframes alc-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---- row ---- */
+.alc-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  block-size: 56px;
+  padding-inline: 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  transition: background-color 0.2s ease;
+}
+.alc-row:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+.alc-row[data-pt='root'] { background: color-mix(in srgb, var(--alc-blue) 7%, transparent); }
+.alc-row[data-pt='also'] { background: color-mix(in srgb, var(--alc-blue) 5%, transparent); }
+.alc-row[data-pt='cant'] { background: color-mix(in srgb, var(--alc-amber) 8%, transparent); }
+
+/* divider sits on top of every row but the first; it hides next to a lit row */
+.alc-item + .alc-item .alc-row::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 50px 12px;
+  block-size: 1px;
+  background: var(--alc-line);
+  transition: opacity 0.2s ease;
+}
+.alc-item:has(.alc-row[data-pt]) + .alc-item .alc-row::before,
+.alc-item + .alc-item .alc-row[data-pt]::before { opacity: 0; }
+
+/* logo tile */
+.alc-tile {
+  inline-size: 28px; block-size: 28px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--panel);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 8%, transparent), 0 1px 2px rgb(0 0 0 / 0.04);
+  color: var(--alc-ink-2);
+}
+:root[data-theme='dark'] .alc-tile { background: color-mix(in srgb, var(--text) 7%, var(--panel)); }
+.alc-tile-in { display: grid; place-items: center; transition: opacity 0.3s ease, filter 0.3s ease; }
+.alc-tile-in > svg { inline-size: 16px; block-size: 16px; }
+.alc-ic-bad { color: var(--bad); }
+.alc-row[data-s='undone'] .alc-tile-in { opacity: 0.45; filter: grayscale(1); transition-delay: var(--alc-d, 0ms); }
+
+/* two lines, never wrap: rows keep one height */
+.alc-txt { min-inline-size: 0; }
+.alc-txt p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 18px; }
+.alc-l1 { color: var(--text); }
+.alc-name { font-weight: 500; }
+.alc-target { margin-inline-start: 6px; color: var(--alc-ink-2); font-weight: 400; }
+.alc-l2 { color: var(--alc-ink-3); }
+.alc-before { text-decoration: line-through; text-decoration-thickness: 1px; }
+.alc-arrow { display: inline-block; margin-inline: 8px; color: var(--alc-ink-4); font-size: 11px; }
+:dir(rtl) .alc-arrow { transform: scaleX(-1); }
+
+/* the line that is drawn across a row when it is undone */
+.alc-strike {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 58% / 0% 1px;
+  transition: background-size 0.28s var(--alc-ease) var(--alc-d, 0ms);
+}
+:dir(rtl) .alc-strike { background-position: 100% 58%; }
+.alc-row[data-s='undone'] .alc-strike { background-size: 100% 1px; }
+.alc-row[data-s='undone'] .alc-txt { opacity: 0.55; transition: opacity 0.3s ease var(--alc-d, 0ms); }
+.alc-row:not([data-s='undone']) .alc-txt { transition: opacity 0.2s ease; }
+
+/* ---- the right slot: time, Undo, Redo and the flags share one place ---- */
+.alc-slot { display: grid; justify-items: end; align-items: center; min-block-size: 24px; }
+.alc-l {
+  grid-area: 1 / 1;
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+  color: var(--alc-ink-3);
+  font-size: 12.5px; line-height: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+.alc-l-label { color: var(--alc-ink-4); }
+.alc-l-busy { color: var(--alc-ink-3); }
+
+/* what shows at rest */
+.alc-row[data-s='done'] .alc-l-time,
+.alc-row[data-s='undone'] .alc-l-label,
+.alc-row[data-s='pending'] .alc-l-busy,
+.alc-row[data-s='failed'] .alc-l-failed,
+.alc-row[data-err] .alc-l-err { opacity: 1; }
+.alc-row[data-err] .alc-l-time { opacity: 0; }
+
+/* pointing at an Undo: lit rows say what happens to them */
+.alc-row[data-pt='also'] .alc-l-time,
+.alc-row[data-pt='cant'] .alc-l-time { opacity: 0; }
+.alc-row[data-pt='also'] .alc-l-also,
+.alc-row[data-pt='cant'] .alc-l-cant { opacity: 1; }
+
+/* hover / focus / the pointed root: the time makes room for Undo (or Redo) */
+.alc-row[data-s='done']:is(:hover, :focus-within, [data-pt='root']):not([data-pt='also'], [data-pt='cant']) :is(.alc-l-time, .alc-l-err) { opacity: 0; }
+.alc-row[data-s='done']:is(:hover, :focus-within, [data-pt='root']):not([data-pt='also'], [data-pt='cant']) .alc-l-undo { opacity: 1; pointer-events: auto; }
+.alc-row.alc-has-redo[data-s='undone']:is(:hover, :focus-within) .alc-l-label { opacity: 0; }
+.alc-row.alc-has-redo[data-s='undone']:is(:hover, :focus-within) .alc-l-redo { opacity: 1; pointer-events: auto; }
+
+/* touch screens have no hover: Undo / Redo are always there, in place of the time */
+@media (hover: none) {
+  .alc-row[data-s='done']:not([data-pt='also'], [data-pt='cant']) :is(.alc-l-time, .alc-l-err) { opacity: 0; }
+  .alc-row[data-s='done']:not([data-pt='also'], [data-pt='cant']) .alc-l-undo { opacity: 1; pointer-events: auto; }
+  .alc-row.alc-has-redo[data-s='undone'] .alc-l-label { opacity: 0; }
+  .alc-row.alc-has-redo[data-s='undone'] .alc-l-redo { opacity: 1; pointer-events: auto; }
+}
+
+/* flags */
+.alc-l-pill { block-size: 20px; padding-inline: 8px; border-radius: 6px; font-weight: 500; font-size: 12.5px; transition: opacity 0.16s ease, background-color 0.2s ease; }
+.alc-pill-blue { color: var(--alc-blue); background: color-mix(in srgb, var(--alc-blue) 12%, transparent); }
+.alc-pill-amber { color: var(--alc-amber); background: color-mix(in srgb, var(--alc-amber) 22%, transparent); }
+:root:not([data-theme='dark']) .alc-pill-amber { background: color-mix(in srgb, var(--alc-amber) 18%, transparent); }
+.alc-pill-bad { color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
+
+/* Undo / Redo */
+.alc-btn {
+  appearance: none; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  block-size: 24px; padding-inline: 8px; margin-inline-end: -8px;
+  border-radius: 8px;
+  background: transparent; color: var(--text);
+  font: inherit; font-size: 13px; font-weight: 500; line-height: 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.alc-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.alc-row[data-pt='root'] .alc-btn { background: color-mix(in srgb, var(--alc-blue) 15%, transparent); color: var(--alc-blue); }
+.alc-btn-redo:hover { background: color-mix(in srgb, var(--text) 7%, transparent); }
+
+/* spinner (the undo is running) */
+.alc-spin { animation: alc-spin 0.8s linear infinite; }
+@keyframes alc-spin { to { transform: rotate(360deg); } }
+
+.alc-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* narrow container: the system name drops off the time, Undo / Redo shrink to round icon buttons */
+@container alc (max-width: 479px) {
+  .alc-sys { display: none; }
+  .alc-row { column-gap: 10px; padding-inline: 8px 10px; }
+  .alc-item + .alc-item .alc-row::before { inset-inline-start: 46px; inset-inline-end: 10px; }
+  .alc-btn { inline-size: 28px; block-size: 28px; padding: 0; margin-inline-end: -4px; border-radius: 50%; }
+  .alc-btn-t { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ledger-item { transition: none; }
+  .alc *, .alc *::before, .alc *::after { transition: none !important; animation: none !important; }
+  .alc-spin { animation: none !important; }
 }
+
+/* an empty ledger sits in the card without a second tinted box */
+.alc-card .empty { background: transparent; box-shadow: none; }

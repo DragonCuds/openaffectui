@@ -5,7 +5,8 @@ import DemoToastSwap from './DemoToastSwap';
 import DemoLoaders from './DemoLoaders';
 import DemoShimmer from './DemoShimmer';
 import DemoBlur from './DemoBlur';
-import DemoApproval from './DemoApproval';
+import DemoApprovalCard from './DemoApprovalCard';
+import DemoLedger from './DemoLedger';
 import DemoInbox from './DemoInbox';
 import DemoDial from './DemoDial';
 import DemoRuns from './DemoRuns';
@@ -69,7 +70,8 @@ export function Showcase() {
       <DemoBlur />
       <DemoLoaders />
       <DemoShimmer />
-      <DemoApproval />
+      <DemoApprovalCard />
+      <DemoLedger />
       <DemoInbox />
       <DemoDial />
       <DemoRuns />

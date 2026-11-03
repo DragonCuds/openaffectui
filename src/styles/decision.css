@@ -1,27 +1,197 @@
-.dec { display: flex; flex-direction: column; gap: var(--s3); }
-.dec-top { display: flex; flex-direction: column; gap: var(--s2); margin-block-end: var(--s1); }
-.dec-count { font-size: var(--fs-sm); color: var(--muted); }
-.dec-card { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4); background: var(--soft); border-radius: var(--radius-panel); animation: dec-in 0.28s var(--ease) both; }
-.dec-q { font-size: var(--fs-md); font-weight: 500; line-height: 1.7; }
-.dec-hint { font-size: var(--fs-sm); color: var(--muted); line-height: 1.7; }
-.dec-opts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-block-start: var(--s1); }
-.dec-opt {
-  min-block-size: 36px; padding: var(--s2) var(--s4); border: 0; border-radius: 999px;
-  background: var(--soft-2); color: var(--text); font-size: var(--fs-md); line-height: 1.4;
-  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+/* Decision Inbox – ported from affectui.com (MIT). Sizes, timings and curves are the original's. */
+.ui-di {
+  --ui-di-tray: var(--soft);
+  --ui-di-card: var(--panel);
+  --ui-di-line: var(--soft);
+  --ui-di-ink: var(--text);
+  --ui-di-muted: var(--muted);
+  --ui-di-faint: color-mix(in srgb, var(--muted) 62%, var(--panel));
+  --ui-di-alert: var(--busy);
+  --ui-di-ok: var(--ok);
+  --ui-di-glyph: #fff;
+  --ui-di-btn-bg: var(--panel);
+  --ui-di-btn-hover: color-mix(in srgb, var(--text) 4%, var(--panel));
+  --ui-di-btn-ring: color-mix(in srgb, var(--text) 10%, transparent);
+  --ui-di-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  /* Like the Chat Composer: a gray tray with the heading, the white card sits on top of it */
+  background: var(--ui-di-tray);
+  /* The gray tray frames the white card on every side */
+  padding: 6px;
+  border-radius: 22px;
+  font-family: inherit;
+  color: var(--ui-di-ink);
+  -webkit-font-smoothing: antialiased;
 }
-.dec-opt:hover { background: var(--panel); box-shadow: var(--shadow-sm); }
-.dec-opt[aria-checked='true'] { background: var(--primary); color: var(--on-primary); }
-.dec-done { display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s4); min-block-size: 44px; background: var(--soft); border-radius: var(--radius-card); color: var(--ok); }
-.dec-done-text { flex: 1; min-inline-size: 0; color: var(--text); font-size: var(--fs-md); line-height: 1.6; overflow-wrap: anywhere; }
-.dec-done-text .muted { font-size: var(--fs-sm); }
-.dec .dec-change { flex: none; background: var(--soft-2); }
-.dec-all { text-align: center; color: var(--muted); font-size: var(--fs-md); padding-block: var(--s2); animation: dec-in 0.28s var(--ease) both; }
-@keyframes dec-in { from { opacity: 0; transform: translateY(6px); } }
-@media (max-width: 480px) {
-  .dec-opts { flex-direction: column; }
-  .dec-opt { text-align: start; }
+.ui-di *, .ui-di *::before, .ui-di *::after { box-sizing: border-box; }
+.ui-di button { margin: 0; font: inherit; cursor: pointer; }
+.ui-di button:focus-visible, .ui-di [tabindex='-1']:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-di__head:focus { outline: none; }
+.ui-di__head:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; border-radius: 16px; }
+
+.ui-di__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--ui-di-alert);
+  transition: color 300ms ease;
 }
+.ui-di[data-clear] .ui-di__head { color: var(--ui-di-ok); }
+
+.ui-di__card {
+  overflow: hidden;
+  background: var(--ui-di-card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm), 0 0 0 1px color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+/* Rows fold away with a height transition once answered */
+.ui-di__row {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 460ms var(--ui-di-ease), opacity 300ms ease;
+}
+.ui-di__row[data-gone] { grid-template-rows: 0fr; opacity: 0; }
+.ui-di__row-inner { min-height: 0; overflow: hidden; }
+.ui-di__row + .ui-di__row .ui-di__item { box-shadow: inset 0 1px 0 var(--ui-di-line); transition: box-shadow 300ms ease; }
+.ui-di__row[data-gone] + .ui-di__row .ui-di__item { box-shadow: inset 0 1px 0 transparent; }
+
+.ui-di__item { padding: 16px 20px 14px; }
+.ui-di__item:not([data-open]) { padding-bottom: 16px; }
+.ui-di__title {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: start;
+  color: var(--ui-di-ink);
+  overflow-wrap: anywhere;
+}
+.ui-di__title--folded {
+  /* Still one line however long the title – it opens in full on click */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ui-di-faint);
+  transition: color 160ms ease;
+}
+.ui-di__title--folded:hover { color: var(--ui-di-muted); }
+
+.ui-di__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms var(--ui-di-ease);
+}
+.ui-di__body[data-open] { grid-template-rows: 1fr; }
+/* Room around the buttons so the clipping for the fold never cuts their ring and shadow */
+.ui-di__body-inner {
+  min-height: 0;
+  overflow: hidden;
+  margin-block: 0 -4px;
+  margin-inline: -4px;
+  padding-block: 0 4px;
+  padding-inline: 4px;
+}
+.ui-di__detail {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ui-di-muted);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.ui-di__actions {
+  display: flex;
+  align-items: center;
+  /* Long or translated answers go on a second line instead of out of the card */
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 30px;
+  margin-block-start: 12px;
+}
+
+.ui-di__btn {
+  max-width: 100%;
+  min-height: 30px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ui-di-btn-bg);
+  box-shadow: 0 0 0 1px var(--ui-di-btn-ring), 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-size: 13px !important;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--ui-di-ink);
+  overflow-wrap: anywhere;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+.ui-di__btn:hover { background: var(--ui-di-btn-hover); }
+.ui-di__btn:active { transform: scale(0.98); }
+.ui-di__btn--primary {
+  background: linear-gradient(color-mix(in srgb, var(--primary) 88%, #fff), var(--primary));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 70%, #000), 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: var(--on-primary);
+}
+.ui-di__btn--primary:hover { background: linear-gradient(color-mix(in srgb, var(--primary) 80%, #fff), color-mix(in srgb, var(--primary) 94%, #fff)); }
+
+.ui-di__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  max-width: 100%;
+  color: var(--ui-di-ok);
+  overflow-wrap: anywhere;
+  animation: ui-di-in 360ms var(--ui-di-ease);
+}
+.ui-di__done > span { min-width: 0; }
+
+.ui-di__empty {
+  display: none;
+  margin: 0;
+  padding: 18px 20px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ui-di-muted);
+}
+.ui-di[data-clear] .ui-di__empty { display: block; animation: ui-di-in 420ms var(--ui-di-ease) 300ms both; }
+
+@keyframes ui-di-in {
+  from { opacity: 0; transform: translateY(3px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .dec-card, .dec-all { animation: none; }
+  .ui-di__row, .ui-di__body { transition: none; }
+  .ui-di__done, .ui-di__empty { animation: none !important; }
 }
+
+/* Dark mode: the card lifts above the tray, the primary button inverts like on the original */
+:root[data-theme='dark'] .ui-di {
+  --ui-di-tray: color-mix(in srgb, var(--panel) 78%, #000);
+  --ui-di-card: var(--soft);
+  --ui-di-line: rgba(255, 255, 255, 0.08);
+  --ui-di-faint: color-mix(in srgb, var(--muted) 62%, var(--soft));
+  --ui-di-btn-bg: var(--soft-2);
+  --ui-di-btn-hover: color-mix(in srgb, #fff 5%, var(--soft-2));
+  --ui-di-btn-ring: rgba(255, 255, 255, 0.1);
+}
+:root[data-theme='dark'] .ui-di__card { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+:root[data-theme='dark'] .ui-di__btn { box-shadow: 0 0 0 1px var(--ui-di-btn-ring), 0 1px 2px rgba(0, 0, 0, 0.4); }
+:root[data-theme='dark'] .ui-di__btn--primary {
+  background: linear-gradient(color-mix(in srgb, var(--primary) 100%, #fff), color-mix(in srgb, var(--primary) 92%, #000));
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 #fff;
+}
+:root[data-theme='dark'] .ui-di__btn--primary:hover { background: linear-gradient(#fff, color-mix(in srgb, var(--primary) 96%, #fff)); }
