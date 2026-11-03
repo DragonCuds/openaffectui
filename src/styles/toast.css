@@ -175,7 +175,7 @@
 
 /* phones: full width, 12px gutters, safe-area bottom */
 @media (max-width: 599px) {
-  .tsc { --tsc-edge: 12px; }
+  .tsc { --tsc-edge: var(--tsc-phone-edge, 12px); }
   .tsc[data-x] {
     left: 12px; right: 12px; inset-inline-start: 12px; inset-inline-end: 12px;
     translate: none; inline-size: auto; margin-inline: 0;

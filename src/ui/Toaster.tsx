@@ -550,6 +550,7 @@ export function Toaster({
   const hk = hotkey ? ` (${hotkey})` : '';
   const regionStyle = {
     '--tsc-offset': `${edge}px`,
+    ...(offset != null ? { '--tsc-phone-edge': `${offset}px` } : {}),
     '--tsc-enter': `${dirSign * -36}px`,
   } as CSSProperties;
 
