@@ -1,4 +1,6 @@
 @import "./states.css";
+@import "./shimmer.css";
+@import "./thinking.css";
 @import "./toast.css";
 @import "./blurswap.css";
 @import "./approval.css";

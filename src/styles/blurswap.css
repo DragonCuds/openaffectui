@@ -1,8 +1,22 @@
-.blurswap { animation: blurswap-in 0.22s var(--ease) both; }
-@keyframes blurswap-in {
-  from { opacity: 0; filter: blur(6px); transform: translateY(4px); }
-  to { opacity: 1; filter: blur(0); transform: none; }
+/* BlurSwap: the box only clips while a swap runs, so shadows and focus rings show otherwise. */
+.blurswap { position: relative; box-sizing: border-box; }
+.blurswap[data-as='span'] { display: inline-block; }
+.blurswap[data-morph='both'] { inline-size: fit-content; }
+
+.blurswap-layer { display: block; transform-origin: 50% 0; }
+.blurswap[data-morph='both'] > .blurswap-layer { inline-size: max-content; }
+
+/* the leaving copy sits on top of the box, anchored at the inline start (right in RTL) */
+.blurswap-layer[data-bs='leave'] {
+  position: absolute; inset-block-start: 0; inset-inline: 0;
+  pointer-events: none; user-select: none;
 }
+.blurswap[data-morph='both'] > .blurswap-layer[data-bs='leave'] { inset-inline-end: auto; }
+
+/* clip during the swap only; blur may bleed sideways when the width is not changing */
+.blurswap[data-swapping] { clip-path: inset(0 -24px); }
+.blurswap[data-swapping][data-morph='both'] { clip-path: inset(0); }
+
 @media (prefers-reduced-motion: reduce) {
-  .blurswap { animation: none; }
+  .blurswap[data-swapping] { clip-path: none; }
 }

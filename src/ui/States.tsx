@@ -2,12 +2,13 @@ import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { Inbox, CircleAlert } from 'lucide-react';
 import { Button } from './Button';
+import { ShimmerBlock } from './Shimmer';
 
-/** Placeholder blocks with a soft shimmer while a screen loads. */
+/** Stacked placeholder blocks with the shared shimmer sweep while a screen loads. */
 export function Skeleton({ rows = 3, height = 64 }: { rows?: number; height?: number }) {
   return (
     <div className="skel-stack" aria-busy="true" aria-label="در حال بارگذاری">
-      {Array.from({ length: rows }, (_, i) => <div className="skel" key={i} style={{ height }} />)}
+      {Array.from({ length: rows }, (_, i) => <ShimmerBlock key={i} height={height} radius="var(--radius-card)" style={{ flexShrink: 0 }} />)}
     </div>
   );
 }

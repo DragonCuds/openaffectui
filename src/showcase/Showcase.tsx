@@ -3,6 +3,8 @@ import { Button, Meter, PageTitle, RollingNumber, Section, Segmented, StatusDot,
 import { Toaster } from '../ui/Toaster';
 import DemoToastSwap from './DemoToastSwap';
 import DemoLoaders from './DemoLoaders';
+import DemoShimmer from './DemoShimmer';
+import DemoBlur from './DemoBlur';
 import DemoApproval from './DemoApproval';
 import DemoInbox from './DemoInbox';
 import DemoDial from './DemoDial';
@@ -64,7 +66,9 @@ export function Showcase() {
       </Section>
 
       <DemoToastSwap />
+      <DemoBlur />
       <DemoLoaders />
+      <DemoShimmer />
       <DemoApproval />
       <DemoInbox />
       <DemoDial />

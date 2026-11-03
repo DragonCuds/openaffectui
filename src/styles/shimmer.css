@@ -1,0 +1,76 @@
+/* Ported from affectUI Shimmer Loader (MIT) — https://www.affectui.com/motion/shimmer-loader
+   Colours come from the panel tokens; light/dark follow :root[data-theme='dark'] like the other kit css. */
+.ui-shm,
+.ui-shm-text {
+  --ui-shm-base: var(--soft-2);
+  --ui-shm-glow: color-mix(in srgb, var(--panel) 90%, transparent);
+  --ui-shm-text: color-mix(in srgb, var(--muted) 55%, var(--panel));
+  --ui-shm-text-glow: var(--panel);
+  --ui-shm-dur: 2.2s;
+}
+
+/* Skeleton: one fixed gradient for the whole viewport, so all blocks sweep together */
+.ui-shm {
+  display: block;
+  /* Fixed sizes keep their size in a row; a % width shrinks to the room that's left */
+  flex: 0 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 12px;
+  max-width: 100%;
+  border-radius: 6px;
+  background-color: var(--ui-shm-base);
+  background-image: linear-gradient(
+    100deg,
+    transparent 0%,
+    transparent 30%,
+    var(--ui-shm-glow) 50%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 150vw 100%;
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  animation: ui-shm-sweep var(--ui-shm-dur) linear infinite;
+}
+@keyframes ui-shm-sweep {
+  from { background-position: -50vw 0; }
+  to { background-position: 100vw 0; }
+}
+
+/* Text: a highlight band runs through the letters */
+.ui-shm-text {
+  display: inline-block;
+  color: var(--ui-shm-text);
+  background-image: linear-gradient(
+    90deg,
+    var(--ui-shm-text) 0%,
+    var(--ui-shm-text) 40%,
+    var(--ui-shm-text-glow) 50%,
+    var(--ui-shm-text) 60%,
+    var(--ui-shm-text) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ui-shm-text var(--ui-shm-text-dur, 2s) linear infinite;
+}
+@keyframes ui-shm-text {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-shm { animation: none; background-image: none; }
+  .ui-shm-text { animation: none; background-image: none; -webkit-text-fill-color: currentColor; }
+}
+
+/* Dark: low-alpha white glow on the darker tint, text glow is the bright text token */
+:root[data-theme='dark'] .ui-shm,
+:root[data-theme='dark'] .ui-shm-text {
+  --ui-shm-glow: rgb(255 255 255 / 0.08);
+  --ui-shm-text: color-mix(in srgb, var(--muted) 65%, var(--panel));
+  --ui-shm-text-glow: var(--text);
+}

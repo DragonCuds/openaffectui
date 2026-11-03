@@ -1,38 +1,198 @@
-.toast-stack {
+/* Toaster: a stack that fans out on hover/focus/tap. Colours come from the panel tokens;
+   light/dark follow :root[data-theme='dark'] like the other kit css. No borders: edges are shadow and tint. */
+
+.tsc {
+  --tsc-w: 356px;
+  --tsc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tsc-dur: 0.5s;
+  --tsc-enter: -36px;
+  --tsc-edge: var(--tsc-offset, 24px);
+  --tsc-bg: var(--panel);
+  --tsc-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 4px 12px rgb(0 0 0 / 0.06),
+    0 14px 32px rgb(0 0 0 / 0.07);
   position: fixed; z-index: 1000;
-  inset-inline: var(--s4); bottom: calc(var(--s4) + env(safe-area-inset-bottom));
-  display: flex; flex-direction: column; align-items: center; gap: var(--s2);
+  inline-size: min(var(--tsc-w), calc(100vw - 24px));
+  pointer-events: none;
+  font-family: var(--font);
+}
+.tsc[data-inline='true'] { position: absolute; }
+
+/* placement */
+.tsc[data-y='top'] { inset-block-start: var(--tsc-edge); }
+.tsc[data-y='bottom'] { inset-block-end: calc(var(--tsc-edge) + env(safe-area-inset-bottom)); }
+.tsc[data-x='start'] { inset-inline-start: var(--tsc-edge); }
+.tsc[data-x='end'] { inset-inline-end: var(--tsc-edge); }
+.tsc[data-x='left'] { left: var(--tsc-edge); }
+.tsc[data-x='right'] { right: var(--tsc-edge); }
+.tsc[data-x='center'] { left: 50%; translate: -50% 0; }
+.tsc[data-inline='true'][data-x='center'] { inset-inline: 0; margin-inline: auto; left: 0; right: 0; translate: none; }
+
+.tsc-list { position: relative; list-style: none; margin: 0; padding: 0; pointer-events: auto; transition: height var(--tsc-dur) var(--tsc-ease); }
+
+/* one toast: positioned by transform only, so the stack reflows without layout work */
+.tsc-toast {
+  position: absolute; inset-inline: 0;
+  outline: none;
+  opacity: 1;
+  transform: translate3d(0, var(--ty, 0px), 0) scale(var(--sc, 1));
+  transition:
+    transform var(--tsc-dur) var(--tsc-ease) calc(var(--i, 0) * 22ms),
+    opacity 0.32s var(--tsc-ease) calc(var(--i, 0) * 22ms);
+  will-change: transform, opacity;
+}
+.tsc[data-y='top'] .tsc-toast { inset-block-start: 0; transform-origin: 50% 100%; }
+.tsc[data-y='bottom'] .tsc-toast { inset-block-end: 0; transform-origin: 50% 0; }
+.tsc[data-fan='false'] .tsc-toast { transition-delay: 0s; }
+
+.tsc-toast[data-ready='false'] {
+  opacity: 0;
+  transform: translate3d(0, calc(var(--ty, 0px) + var(--tsc-enter)), 0) scale(var(--sc, 1));
+  transition: none;
+}
+.tsc-toast[data-hidden='true'] { opacity: 0; pointer-events: none; }
+.tsc-toast[data-leaving='true'] {
+  opacity: 0; pointer-events: none;
+  transform: translate3d(0, var(--ty, 0px), 0) scale(calc(var(--sc, 1) * 0.96));
+  transition: transform 0.24s ease-in, opacity 0.2s ease-in;
+}
+.tsc-toast[data-leaving='true'][data-swiped='true'] {
+  transform: translate3d(0, var(--ty, 0px), 0) scale(var(--sc, 1));
+  transition: opacity 0.3s ease-out 0.05s;
+}
+
+/* swipe layer */
+.tsc-swipe {
+  position: relative;
+  opacity: var(--so, 1);
+  transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0);
+  transition: transform 0.45s var(--tsc-ease), opacity 0.3s var(--tsc-ease);
+  touch-action: none;
+}
+.tsc-swipe[data-dragging='true'] { transition: none; }
+.tsc-swipe[data-swiped='true'] { transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1), opacity 0.3s ease-out; }
+
+/* the card: edge by shadow, not border */
+.tsc-card {
+  position: relative; overflow: hidden;
+  block-size: var(--h, auto);
+  border-radius: 14px;
+  background: var(--tsc-bg); color: var(--text);
+  box-shadow: var(--tsc-shadow);
+  transition: block-size var(--tsc-dur) var(--tsc-ease), box-shadow 0.3s var(--tsc-ease);
+}
+.tsc-toast:focus-visible .tsc-card { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+.tsc-body {
+  display: flex; align-items: flex-start; gap: var(--s3);
+  padding: 14px var(--s4);
+  transition: opacity 0.3s ease 0.06s, visibility 0s linear 0s;
+}
+/* cards behind the front one show only their shape */
+.tsc-toast[data-peek='true'] .tsc-body { opacity: 0; visibility: hidden; transition: opacity 0.16s ease, visibility 0s linear 0.16s; }
+
+.tsc-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; inline-size: 18px; block-size: 21px; color: var(--muted); }
+.tsc-text { flex: 1; min-inline-size: 0; display: grid; }
+.tsc-layer { grid-area: 1 / 1; min-inline-size: 0; }
+.tsc-title { font-size: var(--fs-md); font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+.tsc-desc { margin-block-start: 1px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; overflow-wrap: anywhere; }
+
+/* in-place update: old text blurs out while the new one blurs in */
+.tsc-layer[data-swap='in'] { animation: tsc-swap-in 0.34s var(--tsc-ease) both; }
+.tsc-layer[data-swap='out'] { animation: tsc-swap-out 0.22s ease both; pointer-events: none; user-select: none; }
+@keyframes tsc-swap-in { from { opacity: 0; filter: blur(5px); } to { opacity: 1; filter: blur(0); } }
+@keyframes tsc-swap-out { from { opacity: 1; filter: blur(0); } to { opacity: 0; filter: blur(5px); } }
+
+/* icon: one svg that morphs; the spinner arc grows into the ring, then the glyph draws */
+.tsc-ico { display: block; overflow: visible; }
+.tsc-ring { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 100 0;
+  transition: stroke-dasharray 0.5s var(--tsc-ease), stroke 0.4s ease; }
+.tsc-ring-g { transform-origin: 10px 10px; }
+.tsc-ring-g[data-spin='true'] { animation: tsc-spin 0.9s linear infinite; }
+.tsc-ico[data-kind='loading'] .tsc-ring { stroke-dasharray: 26 74; }
+.tsc-ico[data-kind='success'] { color: var(--ok); }
+.tsc-ico[data-kind='error'] { color: var(--bad); }
+.tsc-ico[data-kind='success'] .tsc-ring { stroke: color-mix(in srgb, var(--ok) 32%, transparent); }
+.tsc-ico[data-kind='error'] .tsc-ring { stroke: color-mix(in srgb, var(--bad) 32%, transparent); }
+.tsc-ico[data-kind='info'] .tsc-ring { stroke: color-mix(in srgb, var(--muted) 45%, transparent); }
+.tsc-glyph { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; transition: stroke-dashoffset 0.25s ease, opacity 0.15s ease; }
+.tsc-ico[data-kind='success'] .tsc-g-check,
+.tsc-ico[data-kind='error'] .tsc-g-bang,
+.tsc-ico[data-kind='info'] .tsc-g-info { stroke-dashoffset: 0; opacity: 1; transition: stroke-dashoffset 0.38s var(--tsc-ease) 0.2s, opacity 0.1s ease 0.2s; }
+@keyframes tsc-spin { to { transform: rotate(360deg); } }
+
+/* action */
+.tsc-action {
+  flex: none; align-self: center;
+  block-size: 30px; padding-inline: var(--s3); border: 0; border-radius: 8px;
+  background: var(--soft); color: var(--text);
+  font: inherit; font-size: var(--fs-sm); font-weight: 500; line-height: 1;
+  transition: background-color 0.2s var(--tsc-ease), transform 0.15s var(--tsc-ease);
+}
+.tsc-action:hover { background: var(--soft-2); }
+.tsc-action:active { transform: scale(0.96); }
+.tsc-action:focus-visible, .tsc-close:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* hairline: a thin tinted bar that runs down with the timer and stops when it pauses */
+.tsc-hair {
+  position: absolute; inset-inline: 14px; inset-block-end: 0; block-size: 1px;
+  background: color-mix(in srgb, var(--text) 14%, transparent);
+  transform-origin: left center;
+  animation: tsc-run var(--dur, 4000ms) linear forwards;
   pointer-events: none;
 }
-.toast {
-  pointer-events: auto;
-  display: flex; align-items: center; gap: var(--s3);
-  width: 100%; max-width: 420px; padding: var(--s3) var(--s4);
-  background: var(--panel); color: var(--text); border-radius: var(--radius-card);
-  box-shadow: var(--shadow-sm), 0 8px 24px rgba(0, 0, 0, 0.12);
-  font-size: var(--fs-md); line-height: 1.6;
-  animation: toast-in 0.28s var(--ease) both;
-}
-.toast-leave { animation: toast-out 0.22s var(--ease) both; }
-.toast-icon { flex: none; }
-.toast-success .toast-icon { color: var(--ok); }
-.toast-error .toast-icon { color: var(--bad); }
-.toast-info .toast-icon { color: var(--info, var(--muted)); }
-.toast-msg { flex: 1; min-width: 0; }
-.toast-close {
-  flex: none; display: inline-flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; border: 0; border-radius: 50%;
-  background: none; color: var(--muted);
-  transition: background-color 0.2s var(--ease);
-}
-.toast-close:hover { background: var(--soft-2); }
+.tsc[dir='rtl'] .tsc-hair { transform-origin: right center; }
+.tsc-hair[data-still='true'] { animation: none; }
+.tsc-hair { transition: opacity 0.2s ease; }
+.tsc-toast[data-peek='true'] .tsc-hair { opacity: 0; }
+.tsc[data-paused='true'] .tsc-hair, .tsc-toast[data-hidden='true'] .tsc-hair { animation-play-state: paused; }
+@keyframes tsc-run { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
-@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } }
-@keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
+/* close: small disc on the inline-start corner; hover/focus on a pointer, always on touch */
+.tsc-close {
+  position: absolute; inset-block-start: -8px; inset-inline-start: -8px;
+  display: grid; place-items: center; inline-size: 22px; block-size: 22px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--tsc-bg); color: var(--muted);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16), 0 3px 8px rgb(0 0 0 / 0.08);
+  opacity: 0; transform: scale(0.8); pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.3s var(--tsc-ease), color 0.2s ease;
+}
+.tsc-toast:hover .tsc-close, .tsc-toast:focus-within .tsc-close { opacity: 1; transform: none; pointer-events: auto; }
+.tsc-close:hover { color: var(--text); }
+@media (hover: none) {
+  .tsc-toast[data-peek='false'] .tsc-close { opacity: 1; transform: none; pointer-events: auto; }
+}
+
+/* dark: shadows barely show, so lift the card with a tint and a soft top highlight */
+:root[data-theme='dark'] .tsc {
+  --tsc-bg: color-mix(in srgb, var(--panel) 90%, var(--text));
+  --tsc-shadow: 0 6px 24px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.05);
+}
+:root[data-theme='dark'] .tsc-close { box-shadow: 0 2px 8px rgb(0 0 0 / 0.5); }
+:root[data-theme='dark'] .tsc-hair { background: color-mix(in srgb, var(--text) 22%, transparent); }
+
+/* phones: full width, 12px gutters, safe-area bottom */
+@media (max-width: 599px) {
+  .tsc { --tsc-edge: 12px; }
+  .tsc[data-x] {
+    left: 12px; right: 12px; inset-inline-start: 12px; inset-inline-end: 12px;
+    translate: none; inline-size: auto; margin-inline: 0;
+  }
+  .tsc[data-inline='true'][data-x] { left: 12px; right: 12px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { animation: toast-fade-in 0.2s linear both; }
-  .toast-leave { animation: toast-fade-out 0.2s linear both; }
-  @keyframes toast-fade-in { from { opacity: 0; } }
-  @keyframes toast-fade-out { to { opacity: 0; } }
+  .tsc-toast { --tsc-enter: 0px !important; transition: opacity 0.2s linear !important; }
+  .tsc-toast[data-leaving='true'] { transform: translate3d(0, var(--ty, 0px), 0) scale(var(--sc, 1)); transition: opacity 0.2s linear !important; }
+  .tsc-list, .tsc-card, .tsc-swipe { transition: none; }
+  .tsc-swipe[data-swiped='true'] { transition: opacity 0.2s linear; }
+  .tsc-body { transition: opacity 0.2s linear !important; }
+  .tsc-close, .tsc-action, .tsc-ring, .tsc-glyph { transition: opacity 0.15s linear; }
+  .tsc-ring-g[data-spin='true'] { animation-duration: 1.6s; }
+  .tsc-layer[data-swap='in'] { animation: tsc-fade-in 0.2s linear both; }
+  .tsc-layer[data-swap='out'] { animation: tsc-fade-out 0.2s linear both; }
+  @keyframes tsc-fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes tsc-fade-out { from { opacity: 1; } to { opacity: 0; } }
 }
