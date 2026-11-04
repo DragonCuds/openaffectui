@@ -19,18 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
--------------------------------------------------------------------------------
-Third-party code
-
-Six components are adapted from the free components of affectUI
-(https://www.affectui.com), which are published under the MIT License,
-Copyright (c) affectui:
-
-  src/ui/DecisionInbox.tsx    src/ui/MessageActions.tsx
-  src/ui/ToolCallCard.tsx     src/ui/ThinkingLoader.tsx
-  src/ui/ChangeSummary.tsx    src/ui/Shimmer.tsx
-
-Each of these files keeps the original notice in its header. Every other
-component was written from scratch for this project. This project is not
-affiliated with or endorsed by affectUI.

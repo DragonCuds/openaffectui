@@ -136,7 +136,7 @@ npx vite build    # static build in site/dist
 
 [MIT](LICENSE) © 2026 DragonCuds.
 
-Six components (`DecisionInbox`, `MessageActions`, `ToolCallCard`, `ThinkingLoader`, `ChangeSummary`, `Shimmer`) are adapted from affectUI's free components, MIT © affectui. Their files keep the original notice. This project is independent and is not affiliated with or endorsed by affectUI.
+Six components (`DecisionInbox`, `MessageActions`, `ToolCallCard`, `ThinkingLoader`, `ChangeSummary`, `Shimmer`) are adapted from affectUI's free components, MIT © affectui. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). This project is independent and is not affiliated with or endorsed by affectUI.
 
 ---
 
