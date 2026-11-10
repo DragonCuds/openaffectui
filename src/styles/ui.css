@@ -24,6 +24,9 @@
 @import "./otp.css";
 @import "./stepper.css";
 @import "./pricing.css";
+@import "./accordion.css";
+@import "./linkbtn.css";
+@import "./cards.css";
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);

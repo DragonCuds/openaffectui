@@ -1,0 +1,4 @@
+/* LinkButton: .btn on an <a>, plus a larger size. */
+a.btn { text-decoration: none; }
+.btn-lg { height: 46px; padding-inline: var(--s5); font-size: var(--fs-lg); font-weight: 600; }
+.btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }

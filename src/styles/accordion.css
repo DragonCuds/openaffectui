@@ -1,0 +1,23 @@
+/* Accordion: tinted rows, no borders. The open row lifts to a panel colour. */
+.acc { display: flex; flex-direction: column; gap: var(--s2); }
+.acc-item { background: var(--soft); border-radius: var(--radius-card); transition: background-color 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+.acc-item[data-open] { background: var(--panel); box-shadow: 0 2px 14px color-mix(in srgb, var(--text) 8%, transparent); }
+.acc-h { margin: 0; font-size: inherit; font-weight: inherit; }
+.acc-btn {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3); inline-size: 100%;
+  padding: var(--s4); border: 0; background: none; border-radius: inherit; text-align: start;
+  font: inherit; font-size: var(--fs-lg); font-weight: 600; line-height: 1.7; color: var(--text); cursor: pointer;
+}
+.acc-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.acc-chev { flex: none; color: var(--muted); transition: transform 0.4s var(--ease); }
+.acc-item[data-open] .acc-chev { transform: rotate(180deg); }
+.acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s var(--ease); }
+.acc-item[data-open] .acc-panel { grid-template-rows: 1fr; }
+.acc-clip { overflow: hidden; min-block-size: 0; }
+.acc-body {
+  padding: 0 var(--s4) var(--s4); color: var(--muted); font-size: var(--fs-md); line-height: 2; opacity: 0; filter: blur(4px);
+  transition: opacity 0.35s var(--ease), filter 0.35s var(--ease);
+}
+.acc-item[data-open] .acc-body { opacity: 1; filter: none; }
+.acc-item:not([data-open]) .acc-clip { visibility: hidden; transition: visibility 0s linear 0.4s; }
+@media (prefers-reduced-motion: reduce) { .acc-item, .acc-chev, .acc-panel, .acc-body { transition: none; } }
