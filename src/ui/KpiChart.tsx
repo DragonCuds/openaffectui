@@ -9,7 +9,10 @@ import {
   type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent,
 } from 'react';
 
-export type KpiSeries = { label: string; color: string; values: number[] };
+/** `null` in `values` = an unknown point: the line breaks there, no dot, the tooltip says `unknownText`. */
+export type KpiSeries = { label: string; color: string; values: (number | null)[] };
+/** A quiet marker on the axis at a point (for example a day something changed); `label` shows in the tooltip. */
+export type KpiMark = { index: number; label: string };
 
 export type KpiChartProps = {
   /** Label above the number. */
@@ -32,6 +35,14 @@ export type KpiChartProps = {
   defaultIndex?: number;
   /** Quiet text in the plot when there are no values, or only zeros. */
   emptyText?: string;
+  /** Points from this index on are drawn dashed and faded (data not complete yet). */
+  freshFrom?: number;
+  /** Tooltip line for a point at or after `freshFrom`. */
+  freshText?: string;
+  /** Tooltip value for a `null` point. */
+  unknownText?: string;
+  /** Small markers on the axis, with a label in the tooltip. */
+  marks?: KpiMark[];
   className?: string;
 };
 
@@ -62,7 +73,7 @@ const safeId = (s: string) => s.replace(/[^a-zA-Z0-9_-]/g, '');
 
 export function KpiChart({
   title, value, delta, labels, tooltipLabels, series, format = defaultFormat,
-  footer, defaultIndex, emptyText = 'هنوز داده‌ای نیست', className,
+  footer, defaultIndex, emptyText = 'هنوز داده‌ای نیست', freshFrom, freshText = 'هنوز کامل نیست', unknownText = 'نامعلوم', marks, className,
 }: KpiChartProps) {
   const uid = safeId(useId());
   const plotRef = useRef<HTMLDivElement>(null);
@@ -79,10 +90,10 @@ export function KpiChart({
   const n = labels.length;
   const lines = useMemo(() => series.map((s, i) => ({
     ...s, color: s.color || FALLBACK[i % FALLBACK.length],
-    values: Array.from({ length: n }, (_, k) => (Number.isFinite(s.values[k]) ? s.values[k] : 0)),
+    values: Array.from({ length: n }, (_, k): number | null => (s.values[k] === null ? null : Number.isFinite(s.values[k]) ? (s.values[k] as number) : 0)),
   })), [series, n]);
 
-  const all = lines.flatMap((s) => s.values);
+  const all = lines.flatMap((s) => s.values.filter((v): v is number => v !== null));
   const percent = /[%٪]/.test(format(0));
   const empty = n === 0 || lines.length === 0 || all.length === 0 || (!percent && all.every((v) => v === 0));
 
@@ -111,6 +122,8 @@ export function KpiChart({
   }, []);
 
   const tickTexts = ticks.map((t) => format(t));
+  // whole-number series (counts) with a small top: «۰٫۵» in the middle reads wrong, so the middle label is left out
+  const halfTick = !Number.isInteger(ticks[1]) && all.every((v) => Number.isInteger(v));
   const gutter = empty ? 30 : Math.min(84, Math.max(30, Math.max(...tickTexts.map((t) => t.length)) * 6.6 + 12));
   const plotL = rtl ? 0 : gutter;
   const plotR = rtl ? W - gutter : W;
@@ -202,8 +215,8 @@ export function KpiChart({
 
   const head = (tooltipLabels?.[at] ?? labels[at] ?? '');
   const sorted = lines
-    .map((s, i) => ({ s, i, v: s.values[at] ?? 0 }))
-    .sort((a, b) => b.v - a.v || a.i - b.i);
+    .map((s, i) => ({ s, i, v: s.values[at] ?? null }))
+    .sort((a, b) => (b.v ?? -Infinity) - (a.v ?? -Infinity) || a.i - b.i);
 
   /* axis labels: first, middle, last */
   const axis: { i: number; mode: 'first' | 'mid' | 'last' }[] = [];
@@ -220,8 +233,33 @@ export function KpiChart({
       : { left: x, maxInlineSize: plotW / 2.4 };
   };
 
-  const paths = lines.map((s) => s.values.map((v, i) => `${i ? 'L' : 'M'}${xAt(i).toFixed(2)} ${yAt(v).toFixed(2)}`).join(''));
-  const sig = `${n}|${lines.map((s) => s.values.join(',')).join(';')}`;
+  /* a null breaks the line; a point with no neighbours is drawn as a dot; the part from `freshFrom` on is a second, dashed path */
+  const fAt = freshFrom != null && freshFrom >= 0 && freshFrom < n ? Math.floor(freshFrom) : null;
+  const freshAt = (i: number) => fAt != null && i >= fAt;
+  const paths = lines.map((s) => {
+    const seg = (from: number, to: number) => {
+      let d = ''; let prev = false;
+      for (let i = from; i < to; i++) {
+        const v = s.values[i];
+        if (v === null) { prev = false; continue; }
+        d += `${prev ? 'L' : 'M'}${xAt(i).toFixed(2)} ${yAt(v).toFixed(2)}`;
+        prev = true;
+      }
+      return d;
+    };
+    const solid = seg(0, fAt ?? n);
+    // the dashed part starts one point earlier so it joins the solid line
+    const fresh = fAt == null ? '' : seg(Math.max(0, fAt - (s.values[fAt - 1] === null ? 0 : 1)), n);
+    const lone: number[] = [];
+    for (let i = 0; i < n; i++) {
+      if (s.values[i] === null) continue;
+      if ((i === 0 || s.values[i - 1] === null) && (i === n - 1 || s.values[i + 1] === null)) lone.push(i);
+    }
+    return { solid: solid.includes('L') ? solid : '', fresh: fresh.includes('L') ? fresh : '', lone };
+  });
+  const markIdx = Array.from(new Set((marks ?? []).map((m) => m.index).filter((i) => Number.isInteger(i) && i >= 0 && i < n)));
+  const markLabels = (marks ?? []).filter((m) => m.index === at).map((m) => m.label);
+  const sig = `${n}|${fAt ?? ''}|${lines.map((s) => s.values.join(',')).join(';')}`;
 
   const tone = delta == null ? null : delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
   const sign = delta == null || delta === 0 ? '' : delta > 0 ? '+' : '−';
@@ -280,18 +318,32 @@ export function KpiChart({
               <g clipPath={`url(#kc${uid})`}>
                 {lines.map((s, k) => (
                   n === 1
-                    ? <circle key={k} cx={xAt(0)} cy={yAt(s.values[0])} r={3} fill={s.color} />
-                    : <path key={k} className="kpi-line" d={paths[k]} stroke={s.color} />
+                    ? (s.values[0] === null ? null : <circle key={k} cx={xAt(0)} cy={yAt(s.values[0])} r={3} fill={s.color} />)
+                    : (
+                      <g key={k}>
+                        {paths[k].solid && <path className="kpi-line" d={paths[k].solid} stroke={s.color} />}
+                        {paths[k].fresh && <path className="kpi-line kpi-line-fresh" d={paths[k].fresh} stroke={s.color} />}
+                        {paths[k].lone.map((i) => (
+                          <circle key={i} cx={xAt(i)} cy={yAt(s.values[i] as number)} r={2.5} fill={s.color} opacity={freshAt(i) ? 0.5 : 1} />
+                        ))}
+                      </g>
+                    )
                 ))}
               </g>
             )}
+            {!empty && markIdx.map((i) => (
+              <path
+                key={`m${i}`} className="kpi-mark" aria-hidden="true"
+                d={`M${xAt(i).toFixed(2)} ${(yAt(min) - 3.5).toFixed(2)} l3.5 3.5 l-3.5 3.5 l-3.5 -3.5 z`}
+              />
+            ))}
             {!empty && (
               <g className="kpi-cursor" data-open={open || undefined} style={{ transform: `translateX(${gx}px)` }}>
                 <rect className="kpi-guide" x={-0.5} y={PLOT_TOP - 4} width={1} height={PLOT_H + 4} />
                 {lines.map((s, k) => (
                   <circle
                     key={k} className="kpi-dot" r={4.5} fill={s.color}
-                    style={{ transform: `translateY(${yAt(s.values[at] ?? 0)}px)` }}
+                    style={{ transform: `translateY(${yAt(s.values[at] ?? 0)}px)`, opacity: s.values[at] === null ? 0 : undefined }}
                   />
                 ))}
               </g>
@@ -300,7 +352,7 @@ export function KpiChart({
 
           {ticks.map((t, k) => (
             <span key={k} className="kpi-ytick" style={{ top: yAt(t) - 8, inlineSize: gutter - 6 }} aria-hidden="true">
-              {empty && k === 1 ? '' : tickTexts[k]}
+              {(empty || halfTick) && k === 1 ? '' : tickTexts[k]}
             </span>
           ))}
           {axis.map(({ i, mode }) => (
@@ -326,10 +378,12 @@ export function KpiChart({
                   <li key={i} className="kpi-tip-row">
                     <i className="kpi-sw" style={{ background: s.color }} aria-hidden="true" />
                     <span className="kpi-tip-k">{s.label}</span>
-                    <span className="kpi-tip-v">{format(v)}</span>
+                    <span className="kpi-tip-v">{v === null ? unknownText : format(v)}</span>
                   </li>
                 ))}
               </ul>
+              {freshAt(at) && <p className="kpi-tip-note">{freshText}</p>}
+              {markLabels.map((l, i) => <p key={i} className="kpi-tip-note kpi-tip-mark"><i aria-hidden="true" />{l}</p>)}
             </div>
           )}
         </div>

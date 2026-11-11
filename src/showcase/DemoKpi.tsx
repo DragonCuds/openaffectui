@@ -30,8 +30,8 @@ const toman = (n: number) =>
     ? `${(Math.round(n / 100) / 10).toLocaleString('fa-IR')} هزار`
     : n.toLocaleString('fa-IR');
 
-const sumLast = CHANNELS.reduce((a, s) => a + s.values[DAYS - 1], 0);
-const sumPrev = CHANNELS.reduce((a, s) => a + s.values[DAYS - 2], 0);
+const sumLast = CHANNELS.reduce((a, s) => a + (s.values[DAYS - 1] ?? 0), 0);
+const sumPrev = CHANNELS.reduce((a, s) => a + (s.values[DAYS - 2] ?? 0), 0);
 
 /** Samples for the showcase: three lines, one line, nothing yet, a drop. */
 export default function DemoKpi() {
@@ -87,6 +87,21 @@ export default function DemoKpi() {
           ]}
           format={(n) => `${n.toLocaleString('fa-IR', { maximumFractionDigits: 1 })}٪`}
           footer="۱۰ روز گذشته"
+        />
+      </Section>
+
+      <Section title="روز نامعلوم، روز تازه و علامت تغییر">
+        <KpiChart
+          title="کلیک از گوگل"
+          labels={labels}
+          tooltipLabels={tooltipLabels}
+          series={[
+            { label: 'کلیک', color: '#2f6bff', values: [120, 132, 128, null, null, 141, 150, 147, 160, null, 171, 168, 175, 181] },
+          ]}
+          format={(n) => n.toLocaleString('fa-IR')}
+          freshFrom={12}
+          marks={[{ index: 6, label: 'این روز صفحه رو عوض کردیم' }, { index: 10, label: 'این روز یه صفحه رو عوض کردیم' }]}
+          footer="جای خالی یعنی نامعلوم، نه صفر. دو روز آخر هنوز کامل نیست."
         />
       </Section>
     </>

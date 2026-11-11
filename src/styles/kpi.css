@@ -58,6 +58,8 @@
 .kpi-svg { display: block; overflow: visible; }
 .kpi-grid { stroke: var(--kpi-grid); stroke-width: 1; shape-rendering: crispEdges; }
 .kpi-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.kpi-line-fresh { stroke-dasharray: 4 5; opacity: 0.55; }
+.kpi-mark { fill: color-mix(in srgb, var(--text) 50%, var(--panel)); pointer-events: none; }
 
 /* lines draw in from the first point (right in rtl): a clip that grows */
 .kpi-reveal {
@@ -106,6 +108,9 @@
 .kpi-sw { flex: none; inline-size: 8px; block-size: 8px; border-radius: 2.5px; }
 .kpi-tip-k { flex: 1; min-inline-size: 0; color: color-mix(in srgb, var(--text) 70%, var(--panel)); padding-inline-end: 16px; overflow: hidden; text-overflow: ellipsis; }
 .kpi-tip-v { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+.kpi-tip-note { display: flex; align-items: center; gap: 6px; margin: 0; padding-block-start: 4px; font-size: 12px; line-height: 18px; white-space: nowrap; color: color-mix(in srgb, var(--text) 62%, var(--panel)); }
+.kpi-tip-mark i { flex: none; inline-size: 6px; block-size: 6px; rotate: 45deg; background: color-mix(in srgb, var(--text) 50%, var(--panel)); }
 
 /* footer: a tinted band instead of a hairline */
 .kpi-foot {

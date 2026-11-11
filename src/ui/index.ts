@@ -41,7 +41,7 @@ export type { ToolCallStatus, ToolCallCardProps, ToolCallGroupProps } from './To
 export { ChangeSummary } from './ChangeSummary';
 export type { MetricChange, ChangeSummaryProps } from './ChangeSummary';
 export { KpiChart } from './KpiChart';
-export type { KpiSeries, KpiChartProps } from './KpiChart';
+export type { KpiSeries, KpiChartProps, KpiMark } from './KpiChart';
 export { CompactBreakdown } from './CompactBreakdown';
 export type { BreakdownItem, BreakdownPeriod, BreakdownPart, CompactBreakdownProps } from './CompactBreakdown';
 export { DateRangePicker } from './DateRangePicker';
