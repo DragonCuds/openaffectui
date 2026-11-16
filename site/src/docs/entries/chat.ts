@@ -367,6 +367,59 @@ export function RewriteReview() {
     related: ['message-actions', 'change-summary', 'agent-ledger', 'chat-composer'],
   },
 
+  /* ------------------------------------------------------------------ sentence-compare */
+  {
+    slug: 'sentence-compare',
+    name: 'SentenceCompare',
+    title: 'مقایسه‌ی جمله‌به‌جمله',
+    category: 'chat',
+    summary: 'نسخه‌ی تازه‌ی یک متن در کنار متن قدیمی: جمله‌های عوض‌شده و اضافه‌شده رنگی‌اند و هر کدام را نگه می‌داری، به قدیمی برمی‌گردانی یا خودت ویرایش می‌کنی.',
+    origin: 'own',
+    file: 'ui/SentenceCompare.tsx',
+    extraFiles: ['styles/sentencecompare.css'],
+    importLine: "import { SentenceCompare } from '@kit/ui';\nimport type { SentenceCompareBlock, SentenceComparePick } from '@kit/ui';",
+    whenToUse: [
+      'سرور متن را بازنویسی کرده و کاربر باید برای هر جمله تصمیم بگیرد.',
+      'ساختار متن (تیتر، بند، فهرست) باید همان‌طور که هست دیده شود.',
+      'تصمیم‌ها را خودت نگه می‌داری و فقط غیرپیش‌فرض‌ها را می‌فرستی.',
+    ],
+    whenNot: [
+      { text: 'می‌خواهی تغییر را کلمه‌به‌کلمه درون یک متن کوتاه بپذیری یا رد کنی.', see: 'inline-diff' },
+    ],
+    usage: `const [picks, setPicks] = useState<Record<string, SentenceComparePick>>({});
+
+<SentenceCompare
+  blocks={blocks}
+  picks={picks}
+  onPick={(id, v) => setPicks((p) => ({ ...p, [id]: v }))}
+  labels={{ keep: 'نگه دار', old: 'متن خودم', remove: 'حذفش کن' }}
+/>
+
+// فقط انتخاب‌های غیرپیش‌فرض را بفرست
+const sent = Object.fromEntries(Object.entries(picks).filter(([, c]) => c.pick !== 'new'));`,
+    props: [
+      {
+        items: [
+          { name: 'blocks', type: 'SentenceCompareBlock[]', required: true, desc: 'بلوک‌ها به ترتیب؛ هر بلوک tag (h2، h3، p یا li)، list (ul یا ol) و جمله‌هایش را دارد. هر جمله id، text، before و kind (same، changed یا added) دارد.' },
+          { name: 'picks', type: 'Record<string, { pick: "new" | "old" | "edit"; text?: string }>', required: true, desc: 'انتخاب‌ها به‌تفکیک id جمله. جمله‌ای که نیست یعنی «نگه دار».' },
+          { name: 'onPick', type: '(id: string, value: SentenceComparePick) => void', required: true, desc: 'با هر انتخاب یا هر حرفِ ویرایش صدا زده می‌شود.' },
+          { name: 'labels', type: 'SentenceCompareLabels', desc: 'متن‌ها: keep، old، remove، edit، originalPrefix، addedBadge، removedNote، editPlaceholder، pickLabel، editLabel. همه پیش‌فرض فارسی دارند.' },
+          { name: 'editMax', type: 'number', default: '1000', desc: 'بیشترین طول جمله‌ی ویرایش‌شده.' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: 'همه‌ی انتخاب‌ها و جعبه‌ی ویرایش را غیرفعال می‌کند.' },
+          { name: 'headingLevel', type: '2 | 3 | 4 | 5', default: '3', desc: 'سطح تیتر برای بلوک h2؛ بلوک h3 یک سطح پایین‌تر می‌شود.' },
+          { name: 'className', type: 'string', desc: 'کلاس اضافه برای ریشه.' },
+        ],
+      },
+    ],
+    a11y: [
+      'تیترها تگ واقعی h3 و h4 هستند و فهرست‌ها ul یا ol.',
+      'هر انتخاب سه‌گانه یک radiogroup با برچسب است و با کلیدهای جهت‌دار می‌چرخد.',
+      'همه‌ی متن‌ها فقط متن ساده‌اند و dir="auto" دارند.',
+    ],
+    responsive: ['جمله‌ها زیر هم می‌آیند و انتخاب سه‌گانه زیر متن هر جمله است؛ روی صفحه‌ی باریک هم جا می‌شود.'],
+    related: ['inline-diff', 'change-summary', 'approval-card'],
+  },
+
   /* ------------------------------------------------------------------ thinking-loader */
   {
     slug: 'thinking-loader',

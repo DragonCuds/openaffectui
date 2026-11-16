@@ -1,0 +1,28 @@
+/* ImagePicker: tiles of chosen pictures plus an add tile. No borders; tinted surfaces. */
+.imgp { display: flex; flex-direction: column; gap: var(--s2); }
+.imgp-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); }
+.imgp-count { font-size: var(--fs-sm); font-weight: 700; color: var(--muted); }
+.imgp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: var(--s2); }
+.imgp-item { display: flex; flex-direction: column; gap: var(--s1); min-inline-size: 0; }
+.imgp-tile { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--soft); }
+.imgp-tile img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+.imgp-x { position: absolute; inset-block-start: 6px; inset-inline-start: 6px; display: grid; place-items: center; inline-size: 32px; block-size: 32px; border: 0; border-radius: 50%; background: rgb(0 0 0 / 0.5); color: #fff; cursor: pointer; transition: background-color 0.2s var(--ease); }
+.imgp-x:hover { background: rgb(0 0 0 / 0.7); }
+.imgp-x:focus-visible, .imgp-add:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.imgp-add { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s1); padding: var(--s2); border: 0; border-radius: 12px; background: var(--soft); color: var(--muted); font: inherit; font-size: var(--fs-sm); font-weight: 600; text-align: center; cursor: pointer; transition: background-color 0.2s var(--ease), color 0.2s var(--ease); }
+.imgp-add:hover { background: var(--soft-2); color: var(--text); }
+.imgp[data-invalid] .imgp-add { background: color-mix(in srgb, var(--bad) 12%, var(--bg)); color: var(--text); }
+.imgp-input { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); opacity: 0; pointer-events: none; }
+/* round (profile photo) */
+.imgp[data-round] .imgp-grid { grid-template-columns: 112px; }
+.imgp[data-round] .imgp-tile, .imgp[data-round] .imgp-add { border-radius: 50%; }
+.imgp[data-round] .imgp-x { inset-block-start: 4px; inset-inline-start: 4px; }
+/* video tile inside ImagePicker */
+.imgp-tile video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; pointer-events: none; }
+.imgp-vid { position: absolute; inset-block-end: 6px; inset-inline-start: 6px; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 999px; font-size: var(--fs-sm); font-weight: 600; color: #fff; background: rgb(0 0 0 / 0.5); }
+/* FilePicker: one button that opens the chooser */
+.fpk { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s1); }
+.fpk-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); block-size: 40px; padding-inline: var(--s4); border: 0; border-radius: 999px; background: var(--soft); color: var(--text); font: inherit; font-size: var(--fs-md); font-weight: 600; cursor: pointer; transition: background-color 0.2s var(--ease); }
+.fpk-btn:hover:not(:disabled) { background: var(--soft-2); }
+.fpk-btn:disabled { opacity: 0.5; cursor: default; }
+.fpk-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }

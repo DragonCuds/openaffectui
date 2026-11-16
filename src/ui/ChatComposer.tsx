@@ -146,6 +146,10 @@ export type ChatComposerProps = {
   onConnectApps?: () => void;
   onRequestApproval?: () => void;
   onSelectProject?: () => void;
+  /** Plain message box for talking to a person: just the field and the send button (no attach, approval, model, voice or apps). */
+  simple?: boolean;
+  /** Longest message the field takes. */
+  maxLength?: number;
   className?: string;
 };
 
@@ -398,6 +402,8 @@ export function ChatComposer({
   onConnectApps,
   onRequestApproval,
   onSelectProject,
+  simple = false,
+  maxLength,
   className,
 }: ChatComposerProps) {
   const L = useMemo<ChatComposerLabels>(() => ({ ...faLabels, ...labelOverride }), [labelOverride]);
@@ -664,7 +670,7 @@ export function ChatComposer({
   const labelStyle = { "--cc-load": `${loadMs}ms` } as CSSProperties;
 
   return (
-    <div ref={rootRef} className={`cc${className ? ` ${className}` : ""}`} style={labelStyle} onKeyDown={onRootKey}>
+    <div ref={rootRef} className={`cc${className ? ` ${className}` : ""}`} data-simple={simple ? "1" : undefined} style={labelStyle} onKeyDown={onRootKey}>
       <div
         ref={glide.rootRef}
         className="cc-card"
@@ -685,6 +691,7 @@ export function ChatComposer({
             placeholder={placeholder ?? L.placeholder}
             disabled={disabled}
             hidden={recording}
+            maxLength={maxLength}
             aria-label={placeholder ?? L.placeholder}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={onFieldKey}
@@ -701,113 +708,129 @@ export function ChatComposer({
           ) : null}
         </div>
 
-        {/* toolbar */}
-        <div className="cc-bar">
-          <button type="button" className="cc-btn cc-plus" data-glide="" aria-label={L.attach} disabled={disabled} onClick={() => onAttach?.()}>
-            <Plus size={19} strokeWidth={1.6} aria-hidden="true" />
-          </button>
+        {simple ? (
+          <div className="cc-bar">
+            <span className="cc-spacer" />
+            <button type="button" className="cc-send" aria-label={L.send} disabled={!canSend} onClick={send}>
+              <ArrowUp size={19} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          </div>
+        ) : (
+          <>
+          {/* toolbar */}
+          <div className="cc-bar">
+            <button type="button" className="cc-btn cc-plus" data-glide="" aria-label={L.attach} disabled={disabled} onClick={() => onAttach?.()}>
+              <Plus size={19} strokeWidth={1.6} aria-hidden="true" />
+            </button>
 
-          <button
-            type="button"
-            className="cc-btn cc-approve"
-            data-glide={appr === "idle" ? "" : undefined}
-            data-state={appr}
-            aria-busy={appr === "loading"}
-            aria-label={appr === "granted" ? L.unrestricted : L.requestApproval}
-            disabled={disabled}
-            onClick={approve}
-          >
-            <span className="cc-ap-a" aria-hidden={appr === "granted"}>
-              <Hand className="cc-hand" size={18} strokeWidth={1.6} aria-hidden="true" />
-              <span className="cc-ap-label cc-label">{L.requestApproval}</span>
-            </span>
-            <span className="cc-ap-b" aria-hidden={appr !== "granted"}>
-              <ShieldAlert size={18} strokeWidth={1.6} aria-hidden="true" />
-              <span className="cc-ap-label">{L.unrestricted}</span>
-            </span>
-          </button>
+            <button
+              type="button"
+              className="cc-btn cc-approve"
+              data-glide={appr === "idle" ? "" : undefined}
+              data-state={appr}
+              aria-busy={appr === "loading"}
+              aria-label={appr === "granted" ? L.unrestricted : L.requestApproval}
+              disabled={disabled}
+              onClick={approve}
+            >
+              <span className="cc-ap-a" aria-hidden={appr === "granted"}>
+                <Hand className="cc-hand" size={18} strokeWidth={1.6} aria-hidden="true" />
+                <span className="cc-ap-label cc-label">{L.requestApproval}</span>
+              </span>
+              <span className="cc-ap-b" aria-hidden={appr !== "granted"}>
+                <ShieldAlert size={18} strokeWidth={1.6} aria-hidden="true" />
+                <span className="cc-ap-label">{L.unrestricted}</span>
+              </span>
+            </button>
 
-          <span className="cc-spacer" />
+            <span className="cc-spacer" />
 
-          <div className="cc-end">
-            <div className="cc-grp cc-tools" data-hidden={recording ? "1" : "0"} inert={recording}>
-              <button
-                ref={modelBtn}
-                type="button"
-                className="cc-btn cc-model"
-                data-glide=""
-                data-open={pk.open ? "1" : "0"}
-                role="combobox"
-                aria-label={`${L.model}: ${model.name}`}
-                aria-haspopup="listbox"
-                aria-expanded={pk.open}
-                aria-controls={listId}
-                aria-activedescendant={pk.open ? optId(pk.active) : undefined}
-                disabled={disabled}
-                onClick={() => (pk.open ? closePicker() : openPicker(false))}
-                onKeyDown={(e) => {
-                  pickerKey(e);
-                }}
-              >
-                <span className="cc-model-name">{model.name}</span>
-                <ChevronDown className="cc-chev" size={16} strokeWidth={1.8} aria-hidden="true" />
-              </button>
-              <button ref={micBtn} type="button" className="cc-btn cc-icon-btn cc-mic" aria-label={L.voice} disabled={disabled} onClick={startRec}>
-                <Mic size={19} strokeWidth={1.6} aria-hidden="true" />
-              </button>
-              <button type="button" className="cc-send" aria-label={L.send} disabled={!canSend} onClick={send}>
-                <ArrowUp size={19} strokeWidth={1.8} aria-hidden="true" />
-              </button>
-            </div>
+            <div className="cc-end">
+              <div className="cc-grp cc-tools" data-hidden={recording ? "1" : "0"} inert={recording}>
+                <button
+                  ref={modelBtn}
+                  type="button"
+                  className="cc-btn cc-model"
+                  data-glide=""
+                  data-open={pk.open ? "1" : "0"}
+                  role="combobox"
+                  aria-label={`${L.model}: ${model.name}`}
+                  aria-haspopup="listbox"
+                  aria-expanded={pk.open}
+                  aria-controls={listId}
+                  aria-activedescendant={pk.open ? optId(pk.active) : undefined}
+                  disabled={disabled}
+                  onClick={() => (pk.open ? closePicker() : openPicker(false))}
+                  onKeyDown={(e) => {
+                    pickerKey(e);
+                  }}
+                >
+                  <span className="cc-model-name">{model.name}</span>
+                  <ChevronDown className="cc-chev" size={16} strokeWidth={1.8} aria-hidden="true" />
+                </button>
+                <button ref={micBtn} type="button" className="cc-btn cc-icon-btn cc-mic" aria-label={L.voice} disabled={disabled} onClick={startRec}>
+                  <Mic size={19} strokeWidth={1.6} aria-hidden="true" />
+                </button>
+                <button type="button" className="cc-send" aria-label={L.send} disabled={!canSend} onClick={send}>
+                  <ArrowUp size={19} strokeWidth={1.8} aria-hidden="true" />
+                </button>
+              </div>
 
-            <div className="cc-grp cc-recbar" data-hidden={recording ? "0" : "1"} inert={!recording}>
-              <Trace active={rec === "on"} speakingRef={speakingRef} />
-              <button type="button" className="cc-btn cc-discard" aria-label={L.discard} onClick={discardRec}>
-                <X size={19} strokeWidth={1.8} aria-hidden="true" />
-              </button>
-              <button ref={useBtn} type="button" className="cc-send cc-use" aria-label={L.use} onClick={useRec}>
-                <Check size={19} strokeWidth={2} aria-hidden="true" />
-              </button>
+              <div className="cc-grp cc-recbar" data-hidden={recording ? "0" : "1"} inert={!recording}>
+                <Trace active={rec === "on"} speakingRef={speakingRef} />
+                <button type="button" className="cc-btn cc-discard" aria-label={L.discard} onClick={discardRec}>
+                  <X size={19} strokeWidth={1.8} aria-hidden="true" />
+                </button>
+                <button ref={useBtn} type="button" className="cc-send cc-use" aria-label={L.use} onClick={useRec}>
+                  <Check size={19} strokeWidth={2} aria-hidden="true" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* tray: Connect apps → Select a project */}
-        <div className="cc-tray">
-          <button
-            type="button"
-            className="cc-conn cc-conn-a"
-            data-glide={conn === "idle" ? "" : undefined}
-            data-state={conn}
-            data-shown={conn === "ready" ? "0" : "1"}
-            aria-busy={conn === "loading"}
-            inert={conn === "ready"}
-            aria-hidden={conn === "ready"}
-            disabled={disabled}
-            onClick={connect}
-          >
-            <span className="cc-logos" aria-hidden="true">
-              <span className="cc-logo" style={{ color: "#ea4335" }}><Mail size={18} strokeWidth={2} /></span>
-              <span className="cc-logo" style={{ color: "#2eb67d" }}><Hash size={18} strokeWidth={2.2} /></span>
-              <span className="cc-logo" style={{ color: "#7b68ee" }}><ListChecks size={18} strokeWidth={2.2} /></span>
-            </span>
-            <span className="cc-label cc-conn-label">{L.connectApps}</span>
-          </button>
-          <button
-            type="button"
-            className="cc-conn cc-conn-b"
-            data-glide=""
-            data-shown={conn === "ready" ? "1" : "0"}
-            inert={conn !== "ready"}
-            aria-hidden={conn !== "ready"}
-            disabled={disabled}
-            onClick={() => onSelectProject?.()}
-          >
-            <FolderOpen className="cc-folder" size={18} strokeWidth={1.8} aria-hidden="true" />
-            <span className="cc-conn-label">{L.selectProject}</span>
-            {dir === "rtl" ? <ChevronLeft className="cc-go" size={14} strokeWidth={1.8} aria-hidden="true" /> : <ChevronRight className="cc-go" size={14} strokeWidth={1.8} aria-hidden="true" />}
-          </button>
-        </div>
+          </>
+        )}
+
+        {simple ? null : (
+          <>
+          {/* tray: Connect apps → Select a project */}
+          <div className="cc-tray">
+            <button
+              type="button"
+              className="cc-conn cc-conn-a"
+              data-glide={conn === "idle" ? "" : undefined}
+              data-state={conn}
+              data-shown={conn === "ready" ? "0" : "1"}
+              aria-busy={conn === "loading"}
+              inert={conn === "ready"}
+              aria-hidden={conn === "ready"}
+              disabled={disabled}
+              onClick={connect}
+            >
+              <span className="cc-logos" aria-hidden="true">
+                <span className="cc-logo" style={{ color: "#ea4335" }}><Mail size={18} strokeWidth={2} /></span>
+                <span className="cc-logo" style={{ color: "#2eb67d" }}><Hash size={18} strokeWidth={2.2} /></span>
+                <span className="cc-logo" style={{ color: "#7b68ee" }}><ListChecks size={18} strokeWidth={2.2} /></span>
+              </span>
+              <span className="cc-label cc-conn-label">{L.connectApps}</span>
+            </button>
+            <button
+              type="button"
+              className="cc-conn cc-conn-b"
+              data-glide=""
+              data-shown={conn === "ready" ? "1" : "0"}
+              inert={conn !== "ready"}
+              aria-hidden={conn !== "ready"}
+              disabled={disabled}
+              onClick={() => onSelectProject?.()}
+            >
+              <FolderOpen className="cc-folder" size={18} strokeWidth={1.8} aria-hidden="true" />
+              <span className="cc-conn-label">{L.selectProject}</span>
+              {dir === "rtl" ? <ChevronLeft className="cc-go" size={14} strokeWidth={1.8} aria-hidden="true" /> : <ChevronRight className="cc-go" size={14} strokeWidth={1.8} aria-hidden="true" />}
+            </button>
+          </div>
+          </>
+        )}
       </div>
 
       {pk.mounted ? (

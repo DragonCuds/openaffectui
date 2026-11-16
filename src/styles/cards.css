@@ -77,3 +77,15 @@
 .tile-t { font-size: var(--fs-lg); font-weight: 700; }
 .tile-c { color: var(--muted); font-size: var(--fs-sm); }
 @media (prefers-reduced-motion: reduce) { .adc, .pfc, .tile, .tile-ic { transition: none; } .adc:hover, .pfc:hover, .tile:hover { transform: none; } }
+
+/* AdCard extras */
+.adc-ago { margin-inline-start: auto; color: var(--muted); font-size: var(--fs-sm); white-space: nowrap; }
+.adc-ver { flex: none; color: var(--ok); }
+.adc[data-status] { background: var(--soft); box-shadow: none; }
+.adc[data-status] > :not(.adc-top) { opacity: 0.6; }
+.adc[data-status]:hover { transform: none; box-shadow: none; }
+
+/* pay never breaks; when space is short the applicants + action move under it */
+.adc-foot { flex-wrap: wrap; row-gap: var(--s2); }
+.adc-pay { white-space: nowrap; }
+.adc-side { margin-inline-start: auto; }

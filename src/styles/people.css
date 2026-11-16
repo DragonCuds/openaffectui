@@ -1,0 +1,31 @@
+/* ReviewCard, WorkGrid and the optional price line of ProfileCard. Soft surfaces, no borders. */
+.pfc-price { padding-inline: var(--s1); font-size: var(--fs-md); font-weight: 700; }
+
+.rev { margin: 0; display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); border-radius: var(--radius-panel); background: var(--soft); }
+.rev-top { display: flex; align-items: center; gap: var(--s3); }
+.rev-who { display: flex; flex-direction: column; flex: 1; min-inline-size: 0; line-height: 1.6; }
+.rev-who strong { font-size: var(--fs-md); font-weight: 700; }
+.rev-who span { font-size: var(--fs-sm); color: var(--muted); }
+.rev-stars { display: inline-flex; gap: 2px; flex: none; }
+.rev-stars svg { color: var(--soft-2); fill: var(--soft-2); }
+.rev-stars svg[data-on] { color: #e0a93d; fill: #e0a93d; }
+.rev-text { margin: 0; line-height: 2; font-size: var(--fs-md); text-wrap: pretty; }
+
+.wg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s2); }
+.wg-tile, .wg-big {
+  position: relative; display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; color: hsl(var(--h) 40% 100% / 0.85);
+  background: linear-gradient(145deg, hsl(var(--h) 62% 62%), hsl(calc(var(--h) + 45) 58% 44%));
+}
+.wg-tile { aspect-ratio: 1; border-radius: 12px; cursor: pointer; transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease); }
+.wg-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px color-mix(in srgb, var(--text) 16%, transparent); }
+.wg-tile:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.wg-tile img, .wg-big img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+.wg-cap { position: absolute; inset-inline: 8px; inset-block-end: 8px; padding: 3px 8px; border-radius: 999px; justify-self: start; font-size: var(--fs-sm); font-weight: 600; color: #fff; background: rgb(0 0 0 / 0.28); }
+.wg-big { aspect-ratio: 4 / 3; inline-size: 100%; border-radius: var(--radius-card); }
+.wg-nav { display: flex; align-items: center; justify-content: space-between; inline-size: 100%; color: var(--muted); font-size: var(--fs-md); }
+.wg-step { display: grid; place-items: center; inline-size: 44px; block-size: 44px; border: 0; border-radius: 50%; background: var(--soft); color: var(--text); }
+.wg-step:hover { background: var(--soft-2); }
+.wg-step:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+@media (max-width: 640px) { .wg { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) { .wg-tile { transition: none; } .wg-tile:hover { transform: none; } }

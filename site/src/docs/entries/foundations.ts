@@ -99,8 +99,11 @@ export function RangeSwitch() {
         items: [
           { name: 'label', type: 'string', required: true, desc: 'نام گروه برای صفحه‌خوان (aria-label).' },
           { name: 'value', type: 'T extends string', required: true, desc: 'مقدار گزینه‌ی انتخاب‌شده.' },
-          { name: 'options', type: '{ value: T; label: string }[]', required: true, desc: 'فهرست گزینه‌ها با مقدار و برچسب.' },
+          { name: 'options', type: "{ value: T; label: string; tone?: 'ok' | 'busy' | 'bad' }[]", required: true, desc: 'فهرست گزینه‌ها با مقدار و برچسب؛ tone رنگ تیکه‌ی زیر گزینه‌ی انتخاب‌شده است.' },
           { name: 'onChange', type: '(v: T) => void', required: true, desc: 'وقتی گزینه‌ی تازه‌ای انتخاب شد صدا زده می‌شود.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", desc: 'اندازه؛ sm برای سربرگ و منو، lg برای بالای داشبورد.' },
+          { name: 'block', type: 'boolean', default: 'false', desc: 'همه‌ی عرض ردیف را می‌گیرد و گزینه‌ها عرض را تقسیم می‌کنند.' },
+          { name: 'className', type: 'string', desc: 'کلاس اضافه که کنار seg گذاشته می‌شود.' },
         ],
       },
     ],
@@ -114,7 +117,7 @@ export function RangeSwitch() {
       'فقط گزینه‌ی انتخاب‌شده tabIndex=0 دارد، پس Tab یک بار وارد گروه می‌شود.',
       'کلیدهای جهت‌دار گزینه را انتخاب می‌کنند و فوکوس را هم با آن می‌برند.',
     ],
-    related: ['button', 'stepper'],
+    related: ['button', 'stepper', 'select'],
   },
   {
     slug: 'meter',

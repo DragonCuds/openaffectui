@@ -1,0 +1,11 @@
+/* GaugeTrio. Needs v3-base.css, v3-gauge.css. */
+.v3-trio { padding: 6px 14px; }
+.v3-trio-row { display: grid; padding: 12px 0 14px; }
+.v3-trio-g { display: flex; flex-direction: column; align-items: center; min-inline-size: 0; padding: 4px 0; margin: 0; border: 0; border-radius: var(--v3-r-s); background: none; cursor: pointer; text-align: center; }
+.v3-trio-g:disabled { cursor: default; }
+.v3-trio-g:focus-visible { outline: 2px solid var(--v3-text); outline-offset: 2px; }
+.v3-trio-n { margin-block-start: 4px; font-size: 0.85rem; font-weight: 700; }
+.v3-trio-w { font-size: 0.72rem; font-weight: 500; color: var(--v3-tone, var(--v3-muted)); }
+.v3-trio-rows { display: flex; flex-direction: column; }
+.v3-trio-rows > .v3-row:first-child { box-shadow: 0 -1px 0 var(--v3-surface2); }
+@media (max-width: 380px) { .v3-trio { padding-inline: 8px; } .v3-trio .v3-gauge { --v3-gauge-size: 84px; } }

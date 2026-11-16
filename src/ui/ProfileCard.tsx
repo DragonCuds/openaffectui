@@ -10,11 +10,13 @@ import { faNum } from './digits';
  * Tiles are gradients (`hue`) until real images (`src`) exist. Styles in src/styles/cards.css.
  */
 export function ProfileCard({
-  name, role, hue = 210, rating, jobs, verified, available, availableLabel = 'الان آزاده', gallery = [], tags = [], href = '#', as: Tag = 'a', action,
+  name, role, hue = 210, avatar, rating, jobs, verified, available, availableLabel = 'الان آزاده', gallery = [], tags = [], href = '#', as: Tag = 'a', action, price,
 }: {
   name: string;
   role: string;
   hue?: number;
+  /** Photo URL for the round avatar; initials when missing. */
+  avatar?: string;
   rating?: number;
   jobs?: number;
   verified?: boolean;
@@ -25,6 +27,8 @@ export function ProfileCard({
   href?: string;
   as?: ElementType;
   action?: ReactNode;
+  /** Optional line under the stats, e.g. «از ۱ میلیون تومان». Styles in src/styles/people.css. */
+  price?: ReactNode;
 }) {
   return (
     <Tag href={href} className="pfc">
@@ -39,7 +43,7 @@ export function ProfileCard({
         {available ? <Chip tone="ok" className="pfc-avail" icon={<StatusDot tone="ok" />}>{availableLabel}</Chip> : null}
       </div>
       <div className="pfc-head">
-        <Avatar name={name} hue={hue} size={46} />
+        <Avatar name={name} hue={hue} size={46} src={avatar} />
         <div className="pfc-who">
           <h3 className="pfc-name">{name}{verified ? <BadgeCheck size={17} className="pfc-ok" aria-label="تأیید شده" /> : null}</h3>
           <span className="pfc-role">{role}</span>
@@ -49,6 +53,7 @@ export function ProfileCard({
         {rating != null ? <span><Star size={15} fill="currentColor" aria-hidden="true" />{faNum(rating)}</span> : null}
         {jobs != null ? <span>{faNum(jobs)} کار انجام‌شده</span> : null}
       </div>
+      {price ? <div className="pfc-price">{price}</div> : null}
       {tags.length ? <div className="pfc-tags">{tags.map((t) => <Chip key={t}>{t}</Chip>)}</div> : null}
       {action ? <span className="pfc-go">{action}</span> : null}
     </Tag>

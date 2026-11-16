@@ -1,0 +1,18 @@
+/* Gauge. Needs v3-base.css. */
+.v3-gauge { position: relative; flex: none; inline-size: var(--v3-gauge-size, 92px); aspect-ratio: 100 / 86; }
+.v3-gauge[data-size='lg'] { --v3-gauge-size: min(250px, 100%); inline-size: var(--v3-gauge-size); }
+.v3-gauge-svg { display: block; inline-size: 100%; block-size: 100%; overflow: visible; }
+.v3-gauge-track, .v3-gauge-band { fill: none; stroke-linecap: round; }
+.v3-gauge-track { stroke: var(--v3-track); }
+.v3-gauge-band { stroke: var(--v3-calm); stroke-opacity: 0.6; }
+.v3-gauge[data-late] .v3-gauge-band { stroke-opacity: 0.3; }
+.v3-gauge-dot { fill: var(--v3-tone, var(--v3-muted)); stroke: var(--v3-surface); }
+.v3-gauge[data-size='lg'] .v3-gauge-dot { stroke: var(--v3-bg); }
+/* centre: the ring's centre sits at 50 of 100, the board is 86 high */
+.v3-gauge-c { position: absolute; inset-inline: 0; inset-block-start: 0; block-size: calc(100% * 100 / 86); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.v3-gauge-c b { font-size: 1.55rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; unicode-bidi: isolate; white-space: nowrap; }
+.v3-gauge-c i { font-style: normal; font-size: 0.68rem; color: var(--v3-muted); margin-block-start: 3px; }
+.v3-gauge[data-size='lg'] .v3-gauge-c b { font-size: 4rem; letter-spacing: -0.5px; }
+.v3-gauge[data-size='lg'] .v3-gauge-c i { font-size: 0.875rem; margin-block-start: 8px; }
+.v3-gauge[data-late] .v3-gauge-c b, .v3-gauge[data-empty] .v3-gauge-c b { color: var(--v3-muted); }
+@media (max-width: 380px) { .v3-gauge[data-size='lg'] .v3-gauge-c b { font-size: 3.4rem; } }

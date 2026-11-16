@@ -35,6 +35,7 @@ const kitDemos: Record<string, Demo> = {
   'message-actions': lazy(() => import('@kit/showcase/DemoMessageActions')),
   'tool-call-card': lazy(() => import('@kit/showcase/DemoToolCall')),
   'inline-diff': lazy(() => import('@kit/showcase/DemoDiff')),
+  'sentence-compare': lazy(() => import('@kit/showcase/DemoSentenceCompare')),
   'thinking-loader': lazy(() => import('@kit/showcase/DemoLoaders')),
   'change-summary': lazy(() => import('@kit/showcase/DemoChange')),
   'kpi-chart': lazy(() => import('@kit/showcase/DemoKpi')),
@@ -42,6 +43,8 @@ const kitDemos: Record<string, Demo> = {
   'date-range-picker': lazy(() => import('@kit/showcase/DemoRange')),
   'blur-swap': lazy(() => import('@kit/showcase/DemoBlur')),
   shimmer: lazy(() => import('@kit/showcase/DemoShimmer')),
+  'sleep-bar': lazy(() => import('@kit/showcase/DemoSleepBar')),
+  'day-rows': lazy(() => import('@kit/showcase/DemoDayRows')),
 };
 
 export const DEMOS: Record<string, Demo> = { ...kitDemos, ...localDemos };

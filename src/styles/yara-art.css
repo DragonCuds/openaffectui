@@ -1,0 +1,18 @@
+/* Yara v2 health pieces, part 4: YaraArt drawing. Needs yara-base.css (.yv). Colours only from the yv variables. */
+.yv-art { display: block; flex: none; max-inline-size: 100%; block-size: auto; }
+.yv-art-g1 { stop-color: color-mix(in srgb, var(--yv-primary) 82%, #fff); }
+.yv-art-g2 { stop-color: var(--yv-primary); }
+.yv-art-halo { fill: var(--yv-primary-soft); }
+.yv-art-halo2 { fill: color-mix(in srgb, var(--yv-primary-soft) 45%, transparent); }
+.yv-art-shadow { fill: color-mix(in srgb, var(--yv-text) 9%, transparent); }
+.yv-art-hole { fill: var(--yv-primary-soft); }
+.yv-art-gem { fill: color-mix(in srgb, var(--yv-surface) 55%, transparent); }
+.yv-art-gem-core { fill: var(--yv-primary); }
+.yv-art-wall { fill: var(--yv-surface); }
+.yv-art-roof { stroke: var(--yv-primary); }
+.yv-art-heart { fill: var(--yv-heart); }
+.yv-art-soft-sleep { fill: var(--yv-sleep-soft); } .yv-art-dot-sleep { fill: var(--yv-sleep); }
+.yv-art-soft-temp { fill: var(--yv-temp-soft); } .yv-art-dot-temp { fill: var(--yv-temp); }
+.yv-art-soft-heart { fill: var(--yv-heart-soft); } .yv-art-dot-heart { fill: var(--yv-heart); }
+.yv-art-soft-oxygen { fill: var(--yv-oxygen-soft); }
+.yv-art-soft-steps { fill: var(--yv-steps-soft); }

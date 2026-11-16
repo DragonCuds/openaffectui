@@ -1,0 +1,14 @@
+/* WeekBars. Needs v3-base.css. Columns follow the page direction: the oldest day is at the start edge. */
+.v3-wk { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); inline-size: 100%; text-align: center; }
+.v3-wk-col { display: flex; flex-direction: column; align-items: center; min-inline-size: 0; }
+.v3-wk-plot { position: relative; inline-size: 100%; block-size: 124px; display: flex; align-items: flex-end; justify-content: center; }
+.v3-wk-band { position: absolute; inset-inline: 0; background: var(--v3-calm-dim); }
+.v3-wk-col:first-child .v3-wk-band { border-start-start-radius: 4px; border-end-start-radius: 4px; }
+.v3-wk-col:last-child .v3-wk-band { border-start-end-radius: 4px; border-end-end-radius: 4px; }
+.v3-wk-bar { position: relative; display: block; inline-size: 18px; border-radius: 6px; background: var(--v3-track); }
+.v3-wk-col[data-today] .v3-wk-bar { background: var(--v3-calm); }
+.v3-wk-bar[data-empty] { background: var(--v3-surface2); }
+.v3-wk-v { position: absolute; inset-inline: 0; font-size: 0.72rem; line-height: 1.2; color: var(--v3-muted); font-variant-numeric: tabular-nums; }
+.v3-wk-col[data-today] .v3-wk-v { color: var(--v3-text); font-weight: 700; }
+.v3-wk-d { margin-block-start: 4px; font-size: 0.78rem; color: var(--v3-faint); }
+.v3-wk-col[data-today] .v3-wk-d { color: var(--v3-text); font-weight: 700; }

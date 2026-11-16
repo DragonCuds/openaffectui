@@ -1,0 +1,8 @@
+/* BandChart. Needs v3-base.css. The svg (and so the axis) runs left to right whatever the page direction. */
+.v3-bc { inline-size: 100%; min-inline-size: 0; }
+.v3-bc-svg { display: block; inline-size: 100%; block-size: auto; direction: ltr; overflow: visible; will-change: transform; } /* own layer: grey (not coloured sub-pixel) text edges on the tick labels */
+.v3-bc-band { fill: var(--v3-calm); fill-opacity: 0.12; }
+.v3-bc-line { fill: none; stroke: var(--v3-text); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.v3-bc-lone { fill: var(--v3-text); }
+.v3-bc-now { fill: var(--v3-tone, var(--v3-calm)); stroke: var(--v3-surface); stroke-width: 2.5; }
+.v3-bc-axis text { font-size: 11px; fill: var(--v3-faint); font-family: inherit; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }

@@ -1,0 +1,14 @@
+/* SleepBar. No borders and no inset shadows: stages are told apart by tint (and by the legend). */
+.sleepbar { margin: 0; display: flex; flex-direction: column; gap: var(--s2); inline-size: 100%; }
+.sleepbar-chart { display: flex; flex-direction: column; gap: var(--s1); }
+.sleepbar-track { position: relative; block-size: 40px; border-radius: 10px; background: var(--soft-2); overflow: hidden; }
+.sleepbar-seg { position: absolute; inset-block: 0; min-inline-size: 2px; }
+.sleepbar-seg[data-stage='awake'], .sleepbar-sw[data-stage='awake'] { background: color-mix(in srgb, var(--busy) 62%, var(--panel)); }
+.sleepbar-seg[data-stage='light'], .sleepbar-sw[data-stage='light'] { background: color-mix(in srgb, var(--accent) 24%, var(--panel)); }
+.sleepbar-seg[data-stage='rem'], .sleepbar-sw[data-stage='rem'] { background: color-mix(in srgb, var(--accent) 52%, var(--panel)); }
+.sleepbar-seg[data-stage='deep'], .sleepbar-sw[data-stage='deep'] { background: color-mix(in srgb, var(--accent) 92%, var(--text)); }
+.sleepbar-times { display: flex; justify-content: space-between; gap: var(--s3); color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.sleepbar-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); color: var(--muted); font-size: var(--fs-sm); }
+.sleepbar-legend li { display: inline-flex; align-items: center; gap: var(--s2); }
+.sleepbar-sw { display: inline-block; flex: none; inline-size: 14px; block-size: 14px; border-radius: 4px; }
+.sleepbar-note { color: var(--text); font-weight: 500; }

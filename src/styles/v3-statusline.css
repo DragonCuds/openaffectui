@@ -1,0 +1,7 @@
+/* StatusLine. Needs v3-base.css. */
+.v3-status { display: flex; align-items: center; gap: 10px; min-inline-size: 0; margin: 0 2px; }
+.v3-status-dot { flex: none; inline-size: 9px; block-size: 9px; border-radius: 50%; background: var(--v3-tone, var(--v3-calm)); box-shadow: 0 0 0 4px var(--v3-tone-dim, var(--v3-calm-dim)); margin-inline: 4px; }
+.v3-status-text { flex: 1; min-inline-size: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.5; }
+.v3-status-chip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-block-size: 28px; padding-inline: 10px; border-radius: 999px; background: var(--v3-surface); box-shadow: var(--v3-shadow); font-size: 0.75rem; color: var(--v3-muted); white-space: nowrap; }
+.v3-status-cdot { flex: none; inline-size: 6px; block-size: 6px; border-radius: 50%; background: var(--v3-tone, var(--v3-muted)); }
+@media (max-width: 380px) { .v3-status-chip { padding-inline: 8px; } .v3-status-text { font-size: 1rem; } }

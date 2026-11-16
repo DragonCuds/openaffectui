@@ -348,4 +348,152 @@ export function ReportRange() {
     ],
     related: ['kpi-chart', 'segmented', 'compact-breakdown'],
   },
+  {
+    slug: 'sleep-bar',
+    name: 'SleepBar',
+    title: 'نوار خواب',
+    category: 'data',
+    summary: 'یک شب خواب به‌شکل نوارِ افقی از مرحله‌ها، با ساعت شروع و پایان و راهنمای مرحله‌هایی که واقعاً هستند.',
+    origin: 'own',
+    file: 'ui/SleepBar.tsx',
+    extraFiles: ['styles/sleepbar.css'],
+    importLine: "import { SleepBar, type SleepBarSegment } from '@kit/ui';",
+    whenToUse: [
+      'برای نشان دادن یک شب خواب (بیدار، سبک، عمیق، رؤیا) در یک نگاه، زیر جمله‌ای که خلاصه‌اش را می‌گوید.',
+      'کنار نمودار ضربان: زمان در هر دو از لبه‌ی راست شروع می‌شود، پس زیر هم خوانده می‌شوند.',
+      'وقتی داده بریده بریده است: جاهای بدون داده خالی می‌مانند و پر نمی‌شوند.',
+    ],
+    whenNot: [
+      { text: 'برای ضربان یا هر عدد پیوسته در طول روز، نمودار ضربان مناسب‌تر است.' },
+      { text: 'برای چند عدد کنار هم، ردیف‌های روز کوتاه‌تر است.', see: 'day-rows' },
+    ],
+    usage: `import { SleepBar, type SleepBarSegment } from '@kit/ui';
+
+const night: SleepBarSegment[] = [
+  { start: '2026-11-08T23:10:00+03:30', end: '2026-11-09T01:40:00+03:30', stage: 'deep' },
+  { start: '2026-11-09T01:40:00+03:30', end: '2026-11-09T01:50:00+03:30', stage: 'awake' },
+  { start: '2026-11-09T01:50:00+03:30', end: '2026-11-09T06:40:00+03:30', stage: 'light' },
+];
+
+export function LastNight() {
+  return (
+    <SleepBar
+      segments={night}
+      labels={{ awake: 'بیدار', light: 'خوابِ سبک', deep: 'خوابِ عمیق', rem: 'خوابِ رؤیا' }}
+      ariaLabel="خواب از ۲۳:۱۰ تا ۶:۴۰، یک بار بیدار شد"
+      empty={<p>از دیشب داده‌ی خواب نرسیده.</p>}
+    />
+  );
+}`,
+    props: [
+      {
+        component: 'SleepBar',
+        items: [
+          { name: 'segments', type: 'SleepBarSegment[]', required: true, desc: 'تکه‌های خواب با start و end (زمان ISO با اختلاف ساعت) و stage. تکه‌ی بدون پهنا یا با مرحله‌ی ناشناخته کشیده نمی‌شود.' },
+          { name: 'labels', type: 'Record<SleepStage, string>', required: true, desc: 'واژه‌ی راهنما برای هر مرحله؛ کیت زبان خودش را ندارد.' },
+          { name: 'ariaLabel', type: 'string', required: true, desc: 'توضیح کل نوار برای صفحه‌خوان.' },
+          { name: 'from', type: 'string', desc: 'شروع بازه؛ اگر ندهید از اولین تکه می‌آید.' },
+          { name: 'to', type: 'string', desc: 'پایان بازه؛ اگر ندهید از آخرین تکه می‌آید. تکه‌ها به این بازه بریده می‌شوند.' },
+          { name: 'notes', type: 'Partial<Record<SleepStage, string>>', desc: 'متن کوچک بعد از واژه‌ی راهنما، مثلاً مدت هر مرحله.' },
+          { name: 'formatTime', type: '(iso: string) => string', default: 'ساعت تهران با ارقام فارسی', desc: 'متن دو برچسب ساعت در دو سر نوار.' },
+          { name: 'empty', type: 'ReactNode', desc: 'چیزی که به‌جای نوار نشان داده می‌شود وقتی تکه‌ای برای کشیدن نیست؛ پیش‌فرض هیچ.' },
+          { name: 'rtl', type: 'boolean', default: 'true', desc: 'زمان از لبه‌ی راست شروع شود (مثل نمودار ضربان). نوار جهت خودش را می‌گذارد و به جهت صفحه بستگی ندارد.' },
+          { name: 'className', type: 'string', desc: 'کلاس اضافه روی ریشه.' },
+        ],
+      },
+      {
+        component: 'SleepBarSegment',
+        items: [
+          { name: 'start', type: 'string', required: true, desc: 'شروع تکه (ISO).' },
+          { name: 'end', type: 'string', required: true, desc: 'پایان تکه (ISO).' },
+          { name: 'stage', type: "'awake' | 'light' | 'deep' | 'rem'", required: true, desc: 'مرحله‌ی خواب.' },
+        ],
+      },
+    ],
+    a11y: [
+      'نوار و برچسب‌های ساعتش یک تصویر با role=img هستند و متنش همان ariaLabel است.',
+      'راهنما یک فهرست واقعی بیرون از تصویر است، پس صفحه‌خوان مرحله‌ها را جدا می‌خواند.',
+      'مرحله‌ها فقط با رنگ جدا نمی‌شوند: راهنما هر رنگ را با واژه می‌گوید.',
+    ],
+    responsive: [
+      'نوار همه‌ی عرض را پر می‌کند و راهنما در چند خط می‌شکند، پس اسکرول افقی نداریم.',
+    ],
+    related: ['day-rows', 'kpi-chart'],
+  },
+  {
+    slug: 'day-rows',
+    name: 'DayRows',
+    title: 'ردیف‌های روز',
+    category: 'data',
+    summary: 'فهرستی از روزها، هر روز یک ردیف با چند مقدارِ برچسب‌دار، یک نشانه‌ی ملایم و حالت کم‌رنگ برای روزِ بی‌داده.',
+    origin: 'own',
+    file: 'ui/DayRows.tsx',
+    extraFiles: ['styles/dayrows.css'],
+    importLine: "import { DayRows, type DayRowItem } from '@kit/ui';",
+    whenToUse: [
+      'برای خلاصه‌ی هفته: هر روز اسمش، چند عدد و در صورت لزوم یک نشانه مثل «هشدار داشت».',
+      'وقتی چند عدد کنار هم باید روی گوشی بدون اسکرول افقی خوانده شوند؛ مقدارها می‌شکنند و زیر هم می‌آیند.',
+      'برای نشان دادن مقداری که از بقیه فرق دارد، با رنگ ملایم و بدون هشدار بلند.',
+    ],
+    whenNot: [
+      { text: 'برای مقایسه‌ی دقیق چند ستون با عنوان ثابت، جدول لازم است؛ این قطعه جدول نیست.' },
+      { text: 'برای روند یک عدد در طول زمان، نمودار شاخص بهتر است.', see: 'kpi-chart' },
+    ],
+    usage: `import { DayRows, type DayRowItem } from '@kit/ui';
+
+const rows: DayRowItem[] = [
+  {
+    id: '2026-11-09', label: 'دوشنبه', sub: '۱۸ آبان',
+    cells: [
+      { label: 'ضربانِ آرام', value: '۵۶' },
+      { label: 'خواب', value: '۷ ساعت', tone: 'flag', hint: 'با بقیه‌ی هفته فرق دارد' },
+    ],
+  },
+  { id: '2026-11-08', label: 'یکشنبه', sub: '۱۷ آبان', muted: true, note: 'داده‌ای نرسید', cells: [] },
+];
+
+export function Week() {
+  return <DayRows rows={rows} label="هفت روز گذشته" />;
+}`,
+    props: [
+      {
+        component: 'DayRows',
+        items: [
+          { name: 'rows', type: 'DayRowItem[]', required: true, desc: 'ردیف‌ها به همان ترتیبی که می‌دهید نشان داده می‌شوند.' },
+          { name: 'label', type: 'string', required: true, desc: 'نام فهرست برای صفحه‌خوان.' },
+          { name: 'empty', type: 'ReactNode', desc: 'چیزی که به‌جای فهرست نشان داده می‌شود وقتی ردیفی نیست؛ پیش‌فرض هیچ.' },
+          { name: 'className', type: 'string', desc: 'کلاس اضافه روی ریشه.' },
+        ],
+      },
+      {
+        component: 'DayRowItem',
+        items: [
+          { name: 'id', type: 'string', required: true, desc: 'کلید یکتای ردیف.' },
+          { name: 'label', type: 'ReactNode', required: true, desc: 'برچسب اصلی ردیف، مثلاً روز هفته.' },
+          { name: 'cells', type: 'DayRowCell[]', required: true, desc: 'مقدارهای ردیف؛ هرکدام برچسب و مقدار دارد.' },
+          { name: 'sub', type: 'ReactNode', desc: 'متن کوچک کنار برچسب، مثلاً تاریخ.' },
+          { name: 'tag', type: 'ReactNode', desc: 'نشانه‌ی ملایم در انتهای سطر بالای ردیف.' },
+          { name: 'muted', type: 'boolean', desc: 'ردیف کم‌رنگ، برای روزِ بی‌داده.' },
+          { name: 'note', type: 'ReactNode', desc: 'اگر muted باشد، این متن جای مقدارها را می‌گیرد.' },
+        ],
+      },
+      {
+        component: 'DayRowCell',
+        items: [
+          { name: 'label', type: 'string', required: true, desc: 'نام مقدار.' },
+          { name: 'value', type: 'ReactNode', required: true, desc: 'خود مقدار، از قبل قالب‌بندی‌شده.' },
+          { name: 'tone', type: "'flag'", desc: 'مقدار را ملایم رنگ می‌کند.' },
+          { name: 'hint', type: 'string', desc: 'جمله‌ای فقط برای صفحه‌خوان که بعد از مقدار خوانده می‌شود، مثلاً چرا نشانه خورده.' },
+        ],
+      },
+    ],
+    a11y: [
+      'فهرست واقعی ul با aria-label است و هر ردیف li؛ مقدارها در dl با dt و dd جفت می‌شوند.',
+      'رنگ ملایمِ نشانه تنها حامل معنی نیست؛ hint همان را برای صفحه‌خوان می‌گوید.',
+    ],
+    responsive: [
+      'مقدارهای هر ردیف می‌شکنند و زیر هم می‌آیند؛ هیچ‌وقت اسکرول افقی نداریم.',
+    ],
+    related: ['sleep-bar', 'kpi-chart', 'change-summary'],
+  },
 ];

@@ -1,0 +1,34 @@
+/* «Instrument» (v3) tokens. Scoped to .v3, so nothing existing changes. Every v3 piece carries the class `v3` on its root.
+   Dark mode follows the kit: :root[data-theme='dark'] (a piece can also set data-theme='dark' on itself). Colour only for meaning: calm / attn / help. No borders. */
+.v3 {
+  --v3-bg: #F2F3F4; --v3-surface: #FFFFFF; --v3-surface2: #F2F3F4; --v3-track: #E3E6E8;
+  --v3-text: #0F1214; --v3-muted: #5F676D; --v3-faint: #9AA1A6;
+  --v3-calm: #0E9F6E; --v3-calm-dim: rgba(14, 159, 110, 0.12);
+  --v3-attn: #C77A12; --v3-attn-dim: rgba(199, 122, 18, 0.12);
+  --v3-help: #D23B36; --v3-help-dim: rgba(210, 59, 54, 0.10);
+  --v3-act: #0F1214; --v3-on-act: #FFFFFF;
+  --v3-shadow: 0 1px 2px rgba(15, 18, 20, 0.05);
+  --v3-r: 14px; --v3-r-s: 10px;
+  font-family: inherit; color: var(--v3-text); box-sizing: border-box;
+}
+:root[data-theme='dark'] .v3, .v3[data-theme='dark'] {
+  --v3-bg: #0B0D0F; --v3-surface: #15191C; --v3-surface2: #1C2125; --v3-track: #262C31;
+  --v3-text: #F1F3F4; --v3-muted: #9AA3A9; --v3-faint: #5E666C;
+  --v3-calm: #34D399; --v3-calm-dim: rgba(52, 211, 153, 0.12);
+  --v3-attn: #F0A43A; --v3-attn-dim: rgba(240, 164, 58, 0.13);
+  --v3-help: #FF5A55; --v3-help-dim: rgba(255, 90, 85, 0.13);
+  --v3-act: #F1F3F4; --v3-on-act: #0B0D0F; --v3-shadow: none;
+}
+.v3 *, .v3 *::before, .v3 *::after { box-sizing: border-box; }
+/* :where keeps this at zero specificity so a piece's own button styles (colour, size) win */
+:where(.v3) button { font: inherit; color: inherit; }
+.v3-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* tone to colour, for any v3 element that sets data-tone */
+.v3[data-tone='calm'], .v3 [data-tone='calm'] { --v3-tone: var(--v3-calm); --v3-tone-dim: var(--v3-calm-dim); }
+.v3[data-tone='attn'], .v3 [data-tone='attn'] { --v3-tone: var(--v3-attn); --v3-tone-dim: var(--v3-attn-dim); }
+.v3[data-tone='help'], .v3 [data-tone='help'] { --v3-tone: var(--v3-help); --v3-tone-dim: var(--v3-help-dim); }
+.v3[data-tone='neutral'], .v3 [data-tone='neutral'] { --v3-tone: var(--v3-muted); --v3-tone-dim: var(--v3-surface2); }
+
+/* the white card every v3 section sits in */
+.v3-card { background: var(--v3-surface); border-radius: var(--v3-r); box-shadow: var(--v3-shadow); padding: 16px; min-inline-size: 0; }

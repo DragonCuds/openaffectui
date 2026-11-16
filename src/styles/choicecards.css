@@ -1,0 +1,26 @@
+/* ChoiceCards: a radio group of tinted cards. No borders; the chosen one is darker with a filled dot. */
+.chc { display: flex; flex-direction: column; gap: 8px; min-inline-size: 0; }
+.chc-card {
+  display: flex; align-items: center; gap: 12px; inline-size: 100%; min-inline-size: 0; padding: 14px 14px; border: 0; border-radius: 16px;
+  background: var(--soft); color: var(--text); font: inherit; text-align: start; cursor: pointer;
+  transition: background-color 0.2s var(--ease, ease), box-shadow 0.2s var(--ease, ease);
+}
+.chc-card:hover { background: var(--soft-2); }
+.chc-card[aria-checked='true'] { background: color-mix(in srgb, var(--text) 9%, var(--soft)); box-shadow: inset 0 0 0 2px var(--text); }
+.chc-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.chc-card:disabled { opacity: 0.6; cursor: default; }
+.chc-dot { flex: none; inline-size: 18px; block-size: 18px; border-radius: 50%; background: var(--soft-2); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--text) 30%, transparent); transition: all 0.2s var(--ease, ease); }
+.chc-card[aria-checked='true'] .chc-dot { background: var(--text); box-shadow: inset 0 0 0 4px var(--soft), 0 0 0 2px var(--text); }
+.chc-tx { flex: 1; min-inline-size: 0; display: flex; flex-direction: column; gap: 2px; }
+.chc-title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: var(--fs-lg, 16px); font-weight: 600; }
+.chc-badge { padding: 1px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); font-size: var(--fs-sm, 12.5px); font-weight: 500; }
+.chc-note { color: var(--muted); font-size: var(--fs-sm, 12.5px); line-height: 1.6; }
+.chc-price { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 0; font-variant-numeric: tabular-nums; }
+.chc-price b { font-size: var(--fs-lg, 16px); font-weight: 700; }
+.chc-was { color: var(--muted); font-size: var(--fs-sm, 12.5px); }
+@media (pointer: coarse) { .chc-card { min-block-size: 56px; } }
+
+/* NumberField: the input plus a small unit word beside it */
+.nf-row { display: flex; align-items: center; gap: 10px; }
+.nf-row .fld-input { flex: 1; min-inline-size: 0; }
+.nf-unit { flex: none; color: var(--muted); font-size: var(--fs-md, 14px); }

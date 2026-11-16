@@ -1,0 +1,70 @@
+/* Yara v2 health pieces, part 2: cards. StatusHero, MetricTile, PersonCard, AlertCard, ListRow, SeenRow. Needs yara-base.css (.yv). */
+.yv-card { position: relative; background: var(--yv-surface); border-radius: var(--yv-r-card); padding: 20px; box-shadow: var(--yv-shadow); }
+
+/* tinted gradient + soft glow in the start-top corner (hero, alert) */
+.yv-tinted { overflow: hidden; background: linear-gradient(165deg, var(--yv-tint-soft) 0%, color-mix(in srgb, var(--yv-tint-soft) 35%, var(--yv-surface)) 100%); }
+.yv-tinted::before { content: ''; position: absolute; inline-size: 280px; block-size: 280px; border-radius: 50%; inset-inline-start: -100px; inset-block-start: -120px; background: radial-gradient(closest-side, color-mix(in srgb, var(--yv-tint) 22%, transparent), transparent); pointer-events: none; }
+.yv-tinted > * { position: relative; }
+.yv-tinted .yv-cap { color: color-mix(in srgb, var(--yv-text) 62%, var(--yv-tint-soft)); }
+
+/* StatusHero */
+.yv-hero { display: flex; flex-direction: column; gap: 16px; }
+.yv-hero-row { display: flex; align-items: center; gap: 14px; }
+.yv-hero-text { flex: 1; min-inline-size: 0; }
+.yv-hero-text .yv-cap { margin-block-start: 2px; }
+
+/* MetricTile */
+.yv-metric { display: flex; flex-direction: column; min-inline-size: 0; padding: 16px 16px 14px; border-radius: var(--yv-r-card); background: var(--yv-tint-soft); }
+.yv-metric-k { display: flex; align-items: center; gap: 6px; font-size: var(--t-cap, 0.8125rem); font-weight: 500; color: var(--yv-tint); }
+.yv-metric-ic { display: inline-grid; place-items: center; }
+.yv-metric-v { margin-block-start: 8px; font-size: 1.625rem; line-height: 1.25; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yv-unit { margin-inline: 3px; font-size: var(--t-cap, 0.8125rem); font-weight: 500; color: var(--yv-muted); }
+.yv-metric .yv-spark { margin-block-start: 10px; }
+.yv-bar { block-size: 6px; margin-block-start: 12px; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--yv-text) 10%, transparent); }
+.yv-bar > b { display: block; block-size: 100%; border-radius: 999px; background: var(--yv-tint); }
+.yv-metric > .yv-cap { margin-block-start: 8px; }
+
+/* PersonCard */
+.yv-person { display: block; inline-size: 100%; padding: 18px 16px 16px; border: 0; font: inherit; text-align: start; color: inherit; text-decoration: none; cursor: pointer; transition: box-shadow 0.2s ease; }
+.yv-person:hover { box-shadow: var(--shadow-lift, var(--yv-shadow)); }
+.yv-person-top { display: flex; align-items: center; gap: 12px; padding-inline: 4px; }
+.yv-person-who { flex: 1; min-inline-size: 0; display: block; }
+.yv-person-who .yv-head { display: block; }
+.yv-person-live { display: flex; align-items: center; gap: 8px; margin-block-start: 2px; }
+.yv-person-chip { display: inline-flex; align-items: center; gap: 6px; min-block-size: 30px; margin-block-start: 8px; padding-inline: 12px; border-radius: 999px; font-size: var(--t-cap, 0.8125rem); font-weight: 500; background: var(--yv-tint-soft); color: var(--yv-tint); }
+.yv-person-go { flex: none; display: inline-grid; color: var(--yv-faint); }
+.yv-person-state { display: block; margin: 20px 4px 0; }
+.yv-person-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-block-start: 16px; }
+.yv-mini { display: block; min-inline-size: 0; padding: 12px 12px 10px; border-radius: var(--yv-r-tile); background: var(--yv-sunk); overflow: hidden; }
+.yv-person.yv-tinted .yv-mini { background: color-mix(in srgb, var(--yv-surface) 78%, transparent); }
+.yv-mini-k { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: var(--t-cap, 0.8125rem); font-weight: 500; color: var(--yv-muted); }
+.yv-mini-k > span:first-child { display: inline-grid; place-items: center; color: var(--yv-tint); }
+.yv-mini-v { display: block; margin: 6px 0 8px; font-size: var(--t-head, 1.125rem); font-weight: 700; line-height: 1.3; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.yv-mini .yv-unit { margin-inline: 2px 0; }
+
+/* AlertCard: amber, never alarm-red */
+.yv-alert-top { display: flex; align-items: center; gap: 12px; }
+.yv-alert-who { flex: 1; min-inline-size: 0; }
+.yv-alert-when { display: inline-flex; align-items: center; gap: 6px; min-block-size: 32px; padding-inline: 12px; border-radius: 999px; background: color-mix(in srgb, var(--yv-surface) 70%, transparent); font-size: var(--t-label, 0.875rem); font-weight: 500; font-variant-numeric: tabular-nums; }
+.yv-alert-when > span:first-child { display: inline-grid; color: var(--yv-tint); }
+.yv-alert .yv-title { margin-block: 20px 8px; }
+.yv-alert-sentence { font-size: var(--t-head, 1.125rem); font-weight: 500; line-height: 1.75; margin: 0; }
+.yv-alert-seentext { display: flex; align-items: center; gap: 8px; margin-block-start: 16px; font-size: var(--t-label, 0.875rem); font-weight: 500; color: color-mix(in srgb, var(--yv-text) 62%, var(--yv-tint-soft)); }
+.yv-alert-seentext > span:first-child { display: inline-grid; color: var(--yv-tint); }
+.yv-alert-seen { display: flex; flex-direction: column; gap: 8px; margin-block-start: 12px; }
+.yv-alert-actions { display: flex; flex-direction: column; gap: 4px; margin-block-start: 20px; }
+
+/* ListRow: rows inside a card, separated by space only */
+.yv-row { display: flex; align-items: center; gap: 14px; inline-size: 100%; padding: 6px 0; border: 0; background: none; font: inherit; text-align: start; color: inherit; text-decoration: none; }
+button.yv-row, a.yv-row { cursor: pointer; }
+.yv-row-ic { flex: none; display: inline-grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: var(--yv-r-small); background: var(--yv-tint-soft); color: var(--yv-tint); }
+.yv-row-tx { flex: 1; min-inline-size: 0; display: block; }
+.yv-row-tx > .yv-head, .yv-row-tx > .yv-cap { display: block; }
+.yv-row-end { flex: none; font-size: var(--t-cap, 0.8125rem); color: var(--yv-muted); white-space: nowrap; }
+
+/* SeenRow */
+.yv-seen { display: flex; align-items: center; gap: 12px; }
+.yv-seen-av { position: relative; flex: none; inline-size: 40px; block-size: 40px; }
+.yv-seen-av[data-seen='false'] .yv-avatar { opacity: 0.6; }
+.yv-seen-tick { position: absolute; inset-block-end: 0; inset-inline-end: 0; display: grid; place-items: center; inline-size: 16px; block-size: 16px; border-radius: 999px; background: var(--yv-primary); color: var(--yv-on-primary); }
+.yv-seen-name { flex: 1; min-inline-size: 0; }

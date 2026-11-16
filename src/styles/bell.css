@@ -1,0 +1,15 @@
+/* BellButton: round tinted button with a count badge. No borders; the badge is cut out of the button with a ring of its background. */
+.bell {
+  position: relative; flex: none; display: inline-grid; place-items: center; inline-size: 34px; block-size: 34px; border: 0; border-radius: 50%;
+  background: var(--soft); color: var(--text); text-decoration: none; cursor: pointer;
+  transition: background-color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.bell:hover { background: var(--soft-2); }
+.bell:active { transform: scale(0.94); }
+.bell:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.bell-badge {
+  position: absolute; inset-block-start: -4px; inset-inline-start: -4px; box-sizing: border-box; min-inline-size: 18px; block-size: 18px; padding-inline: 5px;
+  display: grid; place-items: center; border-radius: 999px; background: var(--bad); color: #fff;
+  font-size: 11px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2px var(--bg);
+}
+@media (prefers-reduced-motion: reduce) { .bell { transition: none; } }

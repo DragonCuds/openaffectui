@@ -35,3 +35,13 @@ export function Notice({ message, onRetry }: { message: string; onRetry?: () => 
     </div>
   );
 }
+
+/** A quiet box with a sentence and, optionally, buttons for the next step. */
+export function Callout({ children, action, role, tone }: { children: ReactNode; action?: ReactNode; role?: 'status' | 'note' | 'alert'; /** 'bad' tints it red (a danger the person must read). */ tone?: 'bad' }) {
+  return (
+    <div className="callout" role={role} data-tone={tone}>
+      <p className="callout-t">{children}</p>
+      {action ? <div className="callout-act">{action}</div> : null}
+    </div>
+  );
+}

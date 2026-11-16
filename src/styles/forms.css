@@ -1,0 +1,68 @@
+/* Form controls (TextField, Select, Checkbox, TimeField). No borders: tinted surface + focus ring. */
+.fld { display: flex; flex-direction: column; gap: var(--s1); flex: 1 1 160px; min-inline-size: 0; }
+.fld-label { font-size: var(--fs-sm); color: var(--muted); }
+.fld-hint { font-size: var(--fs-sm); color: var(--muted); line-height: 1.7; }
+.fld-hint[data-error] { color: var(--bad); }
+.fld-input {
+  box-sizing: border-box; inline-size: 100%; min-block-size: 40px; padding: var(--s2) var(--s3); border: 0; border-radius: var(--radius-card);
+  background: var(--soft); color: var(--text); font: inherit; font-size: var(--fs-md);
+  transition: background-color 0.2s var(--ease, ease), box-shadow 0.2s var(--ease, ease);
+}
+.fld-input::placeholder { color: var(--muted); opacity: 0.7; }
+.fld-input:hover:not(:disabled) { background: var(--soft-2); }
+.fld-input:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.fld-input:disabled { opacity: 0.5; }
+.fld-input[data-ltr] { text-align: left; }
+.fld-input[aria-invalid='true'] { background: color-mix(in srgb, var(--bad) 12%, var(--soft)); }
+.fld-time { font-variant-numeric: tabular-nums; max-inline-size: 120px; }
+
+.fld-select { position: relative; display: block; }
+.fld-chev { position: absolute; inset-inline-end: 12px; inset-block-start: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; transition: transform 0.2s var(--ease, ease); }
+
+/* Select: the button shows the value; the list is a popover (portal, fixed) so dialogs never clip it. */
+.sel-btn { display: flex; align-items: center; padding-inline-end: 34px; text-align: start; cursor: pointer; line-height: 1.5; }
+.sel-btn:disabled { cursor: default; }
+.fld-select .sel-btn[data-open] { background: var(--soft-2); }
+.sel-btn[data-open] + .fld-chev { transform: translateY(-50%) rotate(180deg); }
+.sel-value { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sel-value[data-empty] { color: var(--muted); }
+.sel-pop {
+  position: fixed; z-index: 70; box-sizing: border-box; margin: 0; padding: var(--s1); list-style: none; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 2px; border-radius: var(--radius-card); background: var(--panel); color: var(--text);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.18), 0 2px 6px rgb(0 0 0 / 0.06); font-size: var(--fs-md);
+  animation: sel-in 0.16s var(--ease, ease) both; scrollbar-width: thin;
+}
+.sel-pop[data-up] { animation-name: sel-in-up; }
+.sel-pop:focus { outline: none; }
+.sel-opt {
+  flex: none; display: flex; align-items: center; gap: var(--s2); min-block-size: 38px; padding: var(--s1) var(--s3); border-radius: 8px;
+  line-height: 1.6; cursor: pointer; user-select: none; transition: background-color 0.12s var(--ease, ease);
+}
+.sel-opt-t { flex: 1 1 auto; min-inline-size: 0; overflow-wrap: anywhere; }
+.sel-opt[data-active] { background: var(--soft); }
+.sel-opt:active { background: var(--soft-2); }
+.sel-opt[aria-selected='true'] { font-weight: 600; }
+.sel-opt[data-empty] { color: var(--muted); }
+.sel-check { flex: none; color: var(--text); }
+:root[data-theme='dark'] .sel-pop { background: var(--soft); box-shadow: 0 16px 40px rgb(0 0 0 / 0.55); }
+:root[data-theme='dark'] .sel-opt[data-active] { background: var(--soft-2); }
+@keyframes sel-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes sel-in-up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sel-pop { animation: none; } .fld-chev { transition: none; } }
+
+.chk { position: relative; display: inline-flex; align-items: flex-start; gap: var(--s2); cursor: pointer; line-height: 1.7; }
+.chk[data-disabled] { opacity: 0.5; cursor: default; }
+.chk-input { position: absolute; opacity: 0; inline-size: 20px; block-size: 20px; margin: 0; cursor: inherit; }
+.chk-box {
+  flex: none; display: grid; place-items: center; inline-size: 20px; block-size: 20px; margin-block-start: 2px; border-radius: 6px;
+  background: var(--soft-2); color: transparent; transition: background-color 0.18s var(--ease, ease), color 0.18s var(--ease, ease), transform 0.18s var(--ease, ease);
+}
+.chk:hover .chk-box { background: color-mix(in srgb, var(--text) 16%, var(--soft)); }
+.chk-input:checked + .chk-box { background: var(--primary); color: var(--on-primary); }
+.chk-input:active + .chk-box { transform: scale(0.92); }
+.chk-input:focus-visible + .chk-box { outline: 2px solid var(--ring); outline-offset: 2px; }
+.chk-text { display: flex; flex-direction: column; }
+@media (prefers-reduced-motion: reduce) { .fld-input, .chk-box { transition: none; } }
+/* Inside a tinted Surface the default --soft field vanishes; lift it to the panel tone. */
+.surface .fld-input { background: var(--panel, var(--bg)); }
+.surface .fld-input:hover:not(:disabled) { background: color-mix(in srgb, var(--panel, var(--bg)) 70%, var(--soft-2)); }

@@ -1,0 +1,16 @@
+/* DateField: Jalali single date with an inline month grid. No borders. */
+.dfd-btn { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); text-align: start; cursor: pointer; }
+.dfd-v[data-empty] { color: var(--muted); opacity: 0.8; }
+.dfd-cal { padding: var(--s3); border-radius: var(--radius-card); background: var(--soft); display: flex; flex-direction: column; gap: var(--s2); }
+.dfd-nav { display: flex; align-items: center; justify-content: space-between; font-size: var(--fs-md); }
+.dfd-step { display: grid; place-items: center; inline-size: 32px; block-size: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text); cursor: pointer; }
+.dfd-step:hover:not(:disabled) { background: var(--soft-2); }
+.dfd-step:disabled { opacity: 0.3; cursor: default; }
+.dfd-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.dfd-wd { font-size: 11.5px; color: var(--muted); padding-block: 2px; }
+.dfd-day { block-size: 34px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--text); font: inherit; font-size: var(--fs-md); cursor: pointer; }
+.dfd-day:hover:not(:disabled) { background: var(--soft-2); }
+.dfd-day:disabled { opacity: 0.28; cursor: default; }
+.dfd-day[data-today] { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--text) 25%, transparent); }
+.dfd-day[data-on] { background: var(--primary); color: var(--on-primary); }
+.dfd-btn:focus-visible, .dfd-day:focus-visible, .dfd-step:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }

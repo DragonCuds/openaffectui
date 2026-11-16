@@ -1,0 +1,24 @@
+/* Lightbox: dark full-screen viewer. No borders. */
+.lbx { position: fixed; inset: 0; z-index: 80; display: grid; grid-template-rows: minmax(0, 1fr); overflow: hidden; background: rgb(8 8 9 / 0.94); color: #fff; font-family: var(--font); animation: lbx-fade 0.2s var(--ease, ease) both; }
+.lbx-stage { display: grid; place-items: center; padding: 56px 12px 52px; min-block-size: 0; }
+.lbx-media { display: block; max-inline-size: 100%; max-block-size: calc(100dvh - 108px); inline-size: auto; block-size: auto; object-fit: contain; border-radius: 6px; background: #000; }
+.lbx-stage { overflow: hidden; }
+.lbx-x, .lbx-step {
+  position: absolute; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: #fff; cursor: pointer;
+  background: rgb(255 255 255 / 0.14); backdrop-filter: blur(6px); transition: background-color 0.2s var(--ease, ease);
+}
+.lbx-x:hover, .lbx-step:hover { background: rgb(255 255 255 / 0.26); }
+.lbx-x:focus-visible, .lbx-step:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lbx-x { inset-block-start: 12px; inset-inline-start: 12px; inline-size: 40px; block-size: 40px; }
+.lbx-step { inset-block-start: 50%; transform: translateY(-50%); inline-size: 46px; block-size: 46px; }
+.lbx-step[data-side='next'] { inset-inline-start: 14px; }
+.lbx-step[data-side='prev'] { inset-inline-end: 14px; }
+.lbx-count { position: absolute; inset-inline: 0; inset-block-end: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: rgb(255 255 255 / 0.75); pointer-events: none; }
+@media (max-width: 600px) {
+  .lbx-stage { padding-inline: 0; }
+  .lbx-step { inset-block-start: auto; inset-block-end: 6px; transform: none; inline-size: 40px; block-size: 40px; }
+  .lbx-step[data-side='next'] { inset-inline-start: 14px; }
+  .lbx-step[data-side='prev'] { inset-inline-end: 14px; }
+}
+@keyframes lbx-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .lbx { animation: none; } .lbx-x, .lbx-step { transition: none; } }

@@ -1,0 +1,70 @@
+/* LiveSteps / LiveChecks: a live run, step by step. No lines or borders; state is colour and icon. */
+.lvs, .lvc { --lvs-ease: cubic-bezier(0.22, 1, 0.36, 1); margin: 0; padding: 0; list-style: none; min-inline-size: 0; }
+.lvs-sr { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* icon */
+.lvs-ico {
+  --lvs-ico: 22px;
+  display: grid; place-items: center; flex: none; inline-size: var(--lvs-ico); block-size: var(--lvs-ico); border-radius: 50%;
+  background: var(--soft); color: var(--muted);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.35s var(--lvs-ease);
+}
+.lvs-ico[data-size='sm'] { --lvs-ico: 18px; }
+.lvs-ico svg { inline-size: 62%; block-size: 62%; }
+.lvs-ico > i { inline-size: 6px; block-size: 6px; border-radius: 50%; background: color-mix(in srgb, var(--muted) 55%, transparent); }
+.lvs-ico[data-state='run'] { background: transparent; color: var(--text); }
+.lvs-ico[data-state='run'] svg { inline-size: 76%; block-size: 76%; }
+.lvs-ico[data-state='ok'] { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); animation: lvs-pop 0.42s var(--lvs-ease); }
+.lvs-ico[data-state='fail'] { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); animation: lvs-pop 0.42s var(--lvs-ease); }
+.lvs-spin line { stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; opacity: 0.18; animation: lvs-ray 800ms linear infinite; }
+@keyframes lvs-ray { 0% { opacity: 1; } 100% { opacity: 0.18; } }
+@keyframes lvs-pop { 0% { transform: scale(0.55); } 60% { transform: scale(1.12); } 100% { transform: none; } }
+
+/* steps, vertical */
+.lvs { display: flex; flex-direction: column; gap: var(--s3, 12px); }
+.lvs-step { display: flex; align-items: flex-start; gap: var(--s3, 12px); min-inline-size: 0; }
+.lvs-body { display: flex; flex: 1 1 auto; flex-direction: column; gap: 2px; min-inline-size: 0; padding-block-start: 1px; }
+.lvs-label { color: var(--text); font-size: var(--fs-md, 14px); line-height: 1.6; overflow-wrap: anywhere; transition: color 0.3s ease; }
+.lvs-step[data-state='wait'] .lvs-label, .lvs-step[data-state='skip'] .lvs-label { color: var(--muted); }
+.lvs-step[data-state='run'] .lvs-label { font-weight: 600; }
+.lvs-step[data-state='fail'] .lvs-label { color: var(--bad); font-weight: 600; }
+.lvs-detail { color: var(--muted); font-size: var(--fs-sm, 12.5px); line-height: 1.7; overflow-wrap: anywhere; }
+.lvs-step[data-state='fail'] .lvs-detail { color: var(--bad); }
+.lvs-kids { margin-block-start: var(--s2, 8px); min-inline-size: 0; }
+
+/* steps, compact row */
+.lvs-compact { flex-direction: row; flex-wrap: wrap; gap: var(--s2, 8px) var(--s3, 12px); }
+.lvs-chip { display: inline-flex; align-items: center; gap: 6px; color: var(--text); font-size: var(--fs-sm, 12.5px); line-height: 1.6; }
+.lvs-chip[data-state='wait'], .lvs-chip[data-state='skip'] { color: var(--muted); }
+.lvs-chip[data-state='fail'] { color: var(--bad); }
+.lvs-compact .lvs-ico { animation: none; }
+
+/* checks, grouped */
+.lvc { display: flex; flex-direction: column; gap: var(--s3, 12px); padding: var(--s3, 12px); border-radius: var(--radius-card, 12px); background: var(--soft); }
+.lvc-group { display: flex; flex-direction: column; gap: 6px; min-inline-size: 0; }
+.lvc-gname { color: var(--muted); font-size: var(--fs-sm, 12.5px); font-weight: 600; }
+.lvc-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 6px var(--s3, 12px); margin: 0; padding: 0; list-style: none; }
+.lvc-item { display: flex; align-items: flex-start; gap: var(--s2, 8px); min-inline-size: 0; }
+.lvc-text { display: flex; flex-direction: column; min-inline-size: 0; padding-block-start: 0; }
+.lvc-label { color: var(--text); font-size: var(--fs-md, 14px); line-height: 1.3rem; overflow-wrap: anywhere; transition: color 0.3s ease; }
+.lvc-item[data-state='wait'] .lvc-label, .lvc-item[data-state='skip'] .lvc-label { color: var(--muted); }
+.lvc-item[data-state='fail'] .lvc-label { color: var(--bad); font-weight: 600; }
+.lvc-detail { color: var(--muted); font-size: var(--fs-sm, 12.5px); line-height: 1.7; overflow-wrap: anywhere; }
+.lvc-item[data-state='fail'] .lvc-detail { color: var(--bad); }
+
+/* checks, compact */
+.lvc-compact { gap: var(--s2, 8px); }
+.lvc-gline { display: flex; flex-direction: column; gap: 4px; min-inline-size: 0; }
+.lvc-ghead { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2, 8px); font-size: var(--fs-md, 14px); line-height: 1.6; }
+.lvc-ghead b { font-weight: 500; }
+.lvc-count { color: var(--muted); font-size: var(--fs-sm, 12.5px); }
+.lvc-gline[data-state='fail'] .lvc-ghead b { color: var(--bad); }
+.lvc-fails { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; padding-inline: calc(18px + var(--s2, 8px)) 0; }
+.lvc-fails li { display: flex; flex-direction: column; }
+.lvc-fails .lvc-label { color: var(--bad); }
+.lvc-compact .lvs-ico { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lvs-ico { animation: none !important; transition: none !important; }
+  .lvs-spin line { animation-duration: 1ms; animation-iteration-count: 1; opacity: 0.6; }
+}

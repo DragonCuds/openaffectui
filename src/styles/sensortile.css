@@ -1,0 +1,29 @@
+/* SensorTile. Needs yara-base.css (.yv) and the .yv-unit / .yv-bar pieces of yara-cards.css. No borders. */
+.yv-sensor { position: relative; display: flex; flex-direction: column; min-inline-size: 0; padding: 14px 16px 14px; border-radius: var(--yv-r-card); background: var(--yv-tint-soft); }
+.yv-sensor-k { display: flex; align-items: center; gap: 6px; font-size: var(--t-cap, 0.8125rem); font-weight: 500; color: var(--yv-tint); }
+.yv-sensor-ic { display: inline-grid; place-items: center; }
+.yv-sensor-name { flex: 1; min-inline-size: 0; }
+.yv-sensor-q {
+  flex: none; display: inline-grid; place-items: center; inline-size: 32px; block-size: 32px; margin-block: -6px; margin-inline-end: -8px; padding: 0;
+  border: 0; border-radius: 999px; font: inherit; font-size: var(--t-label, 0.875rem); font-weight: 700; line-height: 1; cursor: pointer;
+  color: var(--yv-tint); background: color-mix(in srgb, var(--yv-surface) 70%, transparent);
+  transition: background-color 0.2s ease;
+}
+.yv-sensor-q:hover, .yv-sensor-q[aria-expanded='true'] { background: var(--yv-surface); }
+.yv-sensor-q:focus-visible { outline: 2px solid var(--yv-tint); outline-offset: 2px; }
+.yv-sensor-v { margin-block-start: 8px; font-size: 1.5rem; line-height: 1.3; font-weight: 700; font-variant-numeric: tabular-nums; }
+.yv-sensor[data-muted] .yv-sensor-v { font-size: var(--t-head, 1.125rem); font-weight: 600; color: var(--yv-muted); }
+.yv-sensor-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-block-start: 8px; }
+.yv-sensor-lv, .yv-sensor-note {
+  display: inline-flex; align-items: center; min-block-size: 26px; padding-inline: 10px; border-radius: 999px;
+  font-size: var(--t-cap, 0.8125rem); font-weight: 600; background: var(--yv-surface);
+}
+.yv-sensor-lv { color: var(--yv-muted); }
+.yv-sensor-lv[data-level='great'] { color: var(--yv-calm); }
+.yv-sensor-lv[data-level='good'] { color: var(--yv-primary); }
+.yv-sensor-lv[data-level='fair'] { color: var(--yv-muted); }
+.yv-sensor-lv[data-level='check'] { color: var(--yv-attn); background: var(--yv-attn-soft); }
+.yv-sensor-note { font-weight: 500; color: var(--yv-muted); background: color-mix(in srgb, var(--yv-text) 7%, transparent); }
+.yv-sensor .yv-bar { margin-block-start: 10px; }
+.yv-sensor > .yv-cap { margin-block-start: 8px; }
+.yv-sensor-why { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--yv-r-small); font-size: var(--t-label, 0.875rem); line-height: 1.8; color: var(--yv-text); background: var(--yv-surface); }

@@ -14,4 +14,5 @@ export const localDemos: Record<string, LazyExoticComponent<ComponentType>> = {
   'pricing-plans': lazy(() => import('./DemoPricingPlans')),
   'rolling-number': lazy(() => import('./DemoRollingNumber')),
   toaster: lazy(() => import('./DemoToaster')),
+  select: lazy(() => import('./DemoSelect')),
 };

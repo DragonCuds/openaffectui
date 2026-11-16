@@ -2,6 +2,81 @@ import type { DocEntry } from '../types';
 
 export const forms: DocEntry[] = [
   {
+    slug: 'select',
+    name: 'Select',
+    title: 'فهرست کشویی',
+    category: 'forms',
+    summary: 'یک گزینه از یک فهرست: دکمه مقدار را نشان می‌دهد و فهرست در یک لایه‌ی نرم باز می‌شود، با کیبورد کامل و راست‌به‌چپ.',
+    origin: 'own',
+    file: 'ui/Fields.tsx',
+    extraFiles: ['styles/forms.css'],
+    importLine: "import { Select } from '@kit/ui';",
+    whenToUse: [
+      'برای انتخاب یکی از چند گزینه‌ی ثابت، مثل شهر، محله یا مرتب‌سازی.',
+      'وقتی گزینه‌ها زیادند (بیشتر از پنج تا) و جا برای نشان دادن همه‌شان نیست.',
+      'در فیلترها: placeholder همان گزینه‌ی «همه» با مقدار خالی است.',
+    ],
+    whenNot: [
+      { text: 'برای دو تا پنج گزینه که باید همه دیده شوند، انتخاب قرصی بهتر است.', see: 'segmented' },
+      { text: 'برای چند انتخاب هم‌زمان، از چیپ‌های انتخابی استفاده کنید.' },
+    ],
+    usage: `import { useState } from 'react';
+import { Select } from '@kit/ui';
+
+const CITIES = [
+  { value: 'tehran', label: 'تهران' },
+  { value: 'shiraz', label: 'شیراز' },
+];
+
+export function CityField() {
+  const [city, setCity] = useState<'tehran' | 'shiraz' | ''>('');
+  return (
+    <Select
+      label="شهر"
+      value={city}
+      onChange={setCity}
+      options={CITIES}
+      placeholder="یکی را انتخاب کنید"
+    />
+  );
+}`,
+    props: [
+      {
+        items: [
+          { name: 'label', type: 'string', required: true, desc: 'برچسب بالای فیلد؛ نام دکمه و فهرست هم همین است.' },
+          { name: 'value', type: "V | ''", required: true, desc: "مقدار انتخاب‌شده؛ '' یعنی گزینه‌ی خالی." },
+          { name: 'onChange', type: "(v: V | '') => void", required: true, desc: 'فقط وقتی گزینه‌ی دیگری انتخاب شد صدا زده می‌شود.' },
+          { name: 'options', type: '{ value: V; label: string }[]', required: true, desc: 'گزینه‌ها به‌ترتیب.' },
+          { name: 'placeholder', type: 'string', desc: "گزینه‌ی خالی (مقدار '') در اول فهرست؛ وقتی چیزی انتخاب نشده کم‌رنگ روی دکمه می‌آید." },
+          { name: 'hint', type: 'ReactNode', desc: 'یک خط توضیح زیر فیلد.' },
+          { name: 'disabled', type: 'boolean', default: 'false', desc: 'دکمه را غیرفعال می‌کند.' },
+          { name: 'id', type: 'string', desc: 'شناسه‌ی دکمه، برای فوکوس روی خطا.' },
+          { name: 'className', type: 'string', desc: 'کلاس اضافه که کنار fld گذاشته می‌شود.' },
+        ],
+      },
+    ],
+    keyboard: [
+      { keys: 'Enter / Space / ArrowDown', action: 'فهرست را باز می‌کند و روی گزینه‌ی فعلی می‌رود.' },
+      { keys: 'ArrowDown / ArrowUp', action: 'گزینه‌ی بعدی یا قبلی.' },
+      { keys: 'Home / End / PageUp / PageDown', action: 'اولین، آخرین، یا هشت گزینه جلوتر و عقب‌تر.' },
+      { keys: 'Enter / Space', action: 'گزینه را انتخاب می‌کند و فهرست را می‌بندد.' },
+      { keys: 'Esc', action: 'فهرست را می‌بندد؛ داخل پنجره، خود پنجره بسته نمی‌شود.' },
+      { keys: 'حروف', action: 'به اولین گزینه‌ای که با آن حروف شروع می‌شود می‌پرد؛ تکرار یک حرف بین گزینه‌ها می‌چرخد.' },
+    ],
+    a11y: [
+      'دکمه نقش combobox دارد با aria-haspopup=listbox، aria-expanded و aria-activedescendant.',
+      'فهرست نقش listbox دارد و هر گزینه option است با aria-selected؛ گزینه‌ی انتخاب‌شده تیک هم دارد.',
+      'فوکوس همیشه روی دکمه می‌ماند، پس قفل فوکوس پنجره‌ها به هم نمی‌ریزد.',
+      'کلیک بیرون فهرست را می‌بندد؛ انیمیشن با کاهش حرکت سیستم خاموش می‌شود.',
+    ],
+    responsive: [
+      'فهرست در لایه‌ی بالای صفحه باز می‌شود، پس پنجره یا کارت آن را نمی‌بُرد.',
+      'وقتی پایین جا نیست، رو به بالا باز می‌شود؛ ارتفاعش به جای خالی محدود است و داخل خودش اسکرول می‌خورد.',
+      'در حالت تیره رنگ لایه و سایه عوض می‌شود.',
+    ],
+    related: ['segmented', 'otp-input'],
+  },
+  {
     slug: 'otp-input',
     name: 'OtpInput',
     title: 'ورودی کد یک‌بارمصرف',

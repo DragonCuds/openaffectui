@@ -14,6 +14,11 @@ const TEXT: Record<string, string> = {
   year: 'امسال ۷۴۰ پست منتشر شده است.',
 };
 
+const MODES = [
+  { value: 'work', label: 'کار کردن', tone: 'busy' as const },
+  { value: 'hire', label: 'کار خواستن', tone: 'ok' as const },
+];
+
 const THEMES = [
   { value: 'light', label: 'روشن' },
   { value: 'dark', label: 'تیره' },
@@ -25,6 +30,7 @@ const THEMES = [
 export default function DemoSegmented() {
   const [range, setRange] = useState('week');
   const [theme, setTheme] = useState('auto');
+  const [mode, setMode] = useState('work');
 
   return (
     <>
@@ -32,6 +38,13 @@ export default function DemoSegmented() {
         <div className="kit-stack">
           <Segmented label="بازه‌ی گزارش" value={range} options={RANGES} onChange={setRange} />
           <Surface>{TEXT[range]}</Surface>
+        </div>
+      </Section>
+
+      <Section title="دو حالت با رنگ" aside="tone رنگ تیکه را با گزینه عوض می‌کند؛ block تمام عرض، size کوچک برای سربرگ">
+        <div className="kit-stack">
+          <Segmented label="حالت پنل" value={mode} options={MODES} onChange={setMode} size="lg" block />
+          <Segmented label="حالت پنل" value={mode} options={MODES} onChange={setMode} size="sm" />
         </div>
       </Section>
 

@@ -1,0 +1,14 @@
+/* MetricRow. Needs v3-base.css. */
+.v3-row { display: flex; align-items: center; gap: 10px; inline-size: 100%; min-block-size: 52px; padding: 12px 0; margin: 0; border: 0; background: none; text-align: start; min-inline-size: 0; }
+button.v3-row { cursor: pointer; border-radius: var(--v3-r-s); }
+button.v3-row:focus-visible { outline: 2px solid var(--v3-text); outline-offset: 2px; }
+.v3-row + .v3-row { box-shadow: 0 -1px 0 var(--v3-surface2); } /* tone gap between rows */
+.v3-row-ic { flex: none; display: inline-grid; place-items: center; color: var(--v3-muted); }
+.v3-row-name { flex: 1; min-inline-size: 0; font-size: 0.9rem; font-weight: 500; }
+.v3-row-val { flex: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.v3-row-val b { font-size: 1.15rem; font-weight: 700; }
+.v3-row-val i { font-style: normal; font-size: 0.7rem; color: var(--v3-muted); margin-inline-start: 4px; }
+.v3-row-lv { flex: none; inline-size: 52px; text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--v3-tone, var(--v3-muted)); }
+.v3-row-lv:empty { inline-size: 0; }
+.v3-row-chev { flex: none; color: var(--v3-faint); }
+.v3-row-chev:dir(ltr) { transform: scaleX(-1); }

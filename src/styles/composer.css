@@ -256,3 +256,7 @@
 .demo-chat-bubble { margin: 0; padding: var(--s2) var(--s4); border-radius: var(--radius-card); font-size: var(--fs-md); line-height: 1.8; overflow-wrap: anywhere; white-space: pre-wrap; }
 .demo-chat-user .demo-chat-bubble { background: var(--primary); color: var(--on-primary); }
 .demo-chat-assistant .demo-chat-bubble { background: var(--soft); }
+
+/* simple: a plain message box for talking to a person (field + send only) */
+.cc[data-simple] .cc-main { padding: 14px 16px 0; }
+.cc[data-simple] .cc-bar { padding: 6px 10px 10px; }

@@ -10,3 +10,11 @@
 
 @media (prefers-reduced-motion: reduce) {
 }
+
+/* callout: a quiet tinted box with a sentence and an optional action (no border) */
+.callout { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s4); border-radius: var(--radius-card); background: var(--soft); line-height: 1.9; }
+.callout[data-tone='bad'] { background: color-mix(in srgb, var(--bad) 13%, var(--soft)); }
+.callout[data-tone='bad'] .callout-t { color: var(--bad); }
+.callout-t { margin: 0; font-weight: 600; }
+.callout-act { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.callout .btn:not(.btn-primary) { background: var(--soft-2); }

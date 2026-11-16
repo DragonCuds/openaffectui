@@ -1,0 +1,12 @@
+.copybox { display: flex; flex-direction: column; gap: var(--s1); }
+.copybox-label { font-size: var(--fs-sm); color: var(--muted); }
+.copybox-row { display: flex; align-items: stretch; gap: var(--s2); }
+.copybox-text {
+  flex: 1; min-inline-size: 0; display: block; padding: var(--s3); border-radius: var(--radius-card); background: var(--soft);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--fs-md); line-height: 1.6; word-break: break-all; text-align: left; user-select: all;
+}
+.copybox-btn { flex: none; align-self: center; min-inline-size: 76px; }
+.copybox[data-state='copied'] .copybox-btn { background: color-mix(in srgb, var(--ok) 20%, var(--soft)); }
+.copybox-live { min-block-size: 1.4em; font-size: var(--fs-sm); color: var(--muted); }
+.copybox[data-state='failed'] .copybox-live { color: var(--bad); }
+.copybox[data-state='idle'] .copybox-live { display: none; }

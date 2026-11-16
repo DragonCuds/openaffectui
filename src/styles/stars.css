@@ -1,0 +1,10 @@
+/* Star rating input (StarInput). Same colours as the stars in ReviewCard (people.css). */
+.stin { display: inline-flex; gap: var(--s1); }
+.stin-star { display: inline-grid; place-items: center; inline-size: 40px; block-size: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--soft-2); cursor: pointer; transition: background-color 0.2s var(--ease, ease), transform 0.2s var(--ease, ease); }
+.stin-star svg { fill: currentColor; }
+.stin-star[data-on] { color: #e0a93d; }
+.stin-star:hover:not(:disabled) { background: var(--soft); transform: scale(1.08); }
+.stin-star:disabled { opacity: 0.5; cursor: default; }
+.stin-star:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.stin[data-invalid] .stin-star:not([data-on]) { color: color-mix(in srgb, var(--bad) 35%, var(--soft-2)); }
+@media (prefers-reduced-motion: reduce) { .stin-star { transition: none; } .stin-star:hover:not(:disabled) { transform: none; } }

@@ -1,0 +1,17 @@
+/* LivePill. Needs v3-base.css. */
+.v3-pill { display: inline-flex; align-items: center; gap: 8px; min-block-size: 40px; padding: 0 16px; margin: 0; border: 0; border-radius: 22px; background: var(--v3-surface); box-shadow: var(--v3-shadow); font-size: 0.9rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.v3-pill:disabled { cursor: default; color: var(--v3-text); opacity: 1; }
+.v3-pill:focus-visible { outline: 2px solid var(--v3-text); outline-offset: 2px; }
+.v3-pill-dot { flex: none; inline-size: 8px; block-size: 8px; border-radius: 50%; background: var(--v3-faint); }
+.v3-pill[data-state='measuring'] .v3-pill-dot { background: var(--v3-calm); box-shadow: 0 0 0 4px var(--v3-calm-dim); animation: v3-pill-pulse 1.4s ease-in-out infinite; }
+.v3-pill[data-state='done'] .v3-pill-dot { background: var(--v3-calm); box-shadow: 0 0 0 4px var(--v3-calm-dim); }
+.v3-pill[data-state='failed'] .v3-pill-dot { background: var(--v3-attn); box-shadow: 0 0 0 4px var(--v3-attn-dim); }
+.v3-pill-name { color: var(--v3-muted); font-weight: 500; }
+.v3-pill[data-state='idle'] .v3-pill-txt { color: var(--v3-text); }
+.v3-pill[data-state='measuring'] .v3-pill-txt { color: var(--v3-muted); font-weight: 500; }
+.v3-pill[data-state='failed'] .v3-pill-txt { color: var(--v3-attn); }
+.v3-pill-val { font-variant-numeric: tabular-nums; }
+.v3-pill-val b { font-size: 1.05rem; }
+.v3-pill-val i { font-style: normal; font-size: 0.7rem; font-weight: 500; color: var(--v3-muted); margin-inline-start: 4px; }
+@keyframes v3-pill-pulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .v3-pill[data-state='measuring'] .v3-pill-dot { animation: none; } }

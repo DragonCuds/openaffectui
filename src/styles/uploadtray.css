@@ -1,0 +1,26 @@
+/* UploadTray: files being sent, fixed at the bottom. Tinted surface and a soft shadow, no borders. */
+.upt { position: fixed; z-index: 40; inset-inline: var(--s3); inset-block-end: var(--s3); margin-inline: auto; inline-size: min(420px, calc(100% - var(--s3) * 2)); max-block-size: 50vh; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-panel); background: var(--panel); color: var(--text); box-shadow: 0 12px 40px rgb(0 0 0 / 0.22); animation: upt-in 0.28s var(--ease) both; }
+.upt-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); padding: var(--s2) var(--s3); background: var(--soft); font-size: var(--fs-md); }
+.upt-fold, .upt-x { display: grid; place-items: center; inline-size: 32px; block-size: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+.upt-fold:hover, .upt-x:hover { background: var(--soft-2); color: var(--text); }
+.upt-fold:focus-visible, .upt-x:focus-visible, .upt-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.upt-list { margin: 0; padding: var(--s2); list-style: none; display: flex; flex-direction: column; gap: var(--s2); overflow-y: auto; }
+.upt-row { display: flex; align-items: center; gap: var(--s2); padding: var(--s1); border-radius: var(--radius-card); }
+.upt-row[data-state="error"] { background: color-mix(in srgb, var(--bad) 10%, var(--bg)); }
+.upt-thumb { flex: none; display: grid; place-items: center; inline-size: 40px; block-size: 40px; overflow: hidden; border-radius: 8px; background: var(--soft); color: var(--muted); }
+.upt-thumb img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.upt-main { flex: 1; min-inline-size: 0; display: flex; flex-direction: column; gap: 3px; }
+.upt-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-sm); font-weight: 600; direction: ltr; text-align: start; }
+.upt-bar { display: block; block-size: 5px; border-radius: 999px; background: var(--soft-2); overflow: hidden; }
+.upt-bar > span { display: block; block-size: 100%; border-radius: inherit; background: var(--primary); transition: inline-size 0.2s linear; }
+.upt-note { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: var(--fs-sm); line-height: 1.6; }
+.upt-row[data-state="done"] .upt-note { color: var(--ok); }
+.upt-row[data-state="error"] .upt-note { color: var(--bad); }
+.upt-row[data-state="processing"] .upt-note::before { content: ''; flex: none; inline-size: 12px; block-size: 12px; border-radius: 50%; border: 2px solid currentColor; border-inline-end-color: transparent; animation: btn-spin 0.8s linear infinite; }
+.upt-act { flex: none; display: flex; align-items: center; gap: 2px; }
+.upt-btn { display: inline-flex; align-items: center; gap: 4px; block-size: 32px; padding-inline: var(--s3); border: 0; border-radius: 999px; background: var(--soft); color: var(--text); font: inherit; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
+.upt-btn:hover { background: var(--soft-2); }
+@keyframes upt-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .upt { animation: none; } .upt-bar > span { transition: none; } .upt-row[data-state="processing"] .upt-note::before { animation-duration: 2.4s; } }
+/* lift above a bottom bar (phones) when the page has one */
+@media (max-width: 959px) { body:has(.sticky-bar) .upt { inset-block-end: calc(76px + env(safe-area-inset-bottom, 0px)); } }

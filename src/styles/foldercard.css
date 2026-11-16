@@ -1,0 +1,23 @@
+/* FolderCard: cover + title + count + tags. Tinted surfaces, no borders. */
+.fcard { display: flex; flex-direction: column; gap: var(--s2); inline-size: 100%; min-inline-size: 0; padding: var(--s2); border: 0; border-radius: var(--radius-panel); background: var(--soft); color: var(--text); font: inherit; text-align: start; transition: background-color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.fcard[data-action] { cursor: pointer; }
+.fcard[data-action]:hover:not(:disabled) { background: var(--soft-2); }
+.fcard:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.fcard:disabled { opacity: 0.5; cursor: default; }
+.fcard[data-selected] { background: color-mix(in srgb, var(--ok) 14%, var(--bg)); box-shadow: 0 0 0 2px var(--ok); }
+.fcard-cover {
+  position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 12px; color: hsl(var(--h) 40% 100% / 0.85);
+  background: linear-gradient(145deg, hsl(var(--h) 62% 62%), hsl(calc(var(--h) + 45) 58% 44%));
+}
+.fcard-cover img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+.fcard-n { position: absolute; inset-block-end: 6px; inset-inline-start: 6px; display: grid; place-items: center; min-inline-size: 26px; block-size: 24px; padding-inline: 8px; border-radius: 999px; font-size: var(--fs-sm); font-weight: 700; color: #fff; background: rgb(0 0 0 / 0.5); }
+.fcard-on { position: absolute; inset-block-start: 6px; inset-inline-end: 6px; display: grid; place-items: center; inline-size: 26px; block-size: 26px; border-radius: 50%; background: var(--ok); color: #fff; }
+.fcard-body { display: flex; flex-direction: column; gap: var(--s1); min-inline-size: 0; padding: 0 var(--s1) var(--s1); }
+.fcard-t { font-size: var(--fs-md); font-weight: 700; line-height: 1.6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fcard-tags { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.fcard-hint { color: var(--muted); font-size: var(--fs-sm); line-height: 1.7; }
+.fcard[data-small] { flex-direction: row; align-items: center; gap: var(--s2); padding: var(--s1); border-radius: var(--radius-card); }
+.fcard[data-small] .fcard-cover { flex: none; inline-size: 64px; aspect-ratio: 1; border-radius: 10px; }
+.fcard[data-small] .fcard-n { inset-block-end: 4px; inset-inline-start: 4px; min-inline-size: 20px; block-size: 20px; padding-inline: 5px; font-size: 11px; }
+.fcard[data-small] .fcard-body { padding: 0; flex: 1; }
+@media (prefers-reduced-motion: reduce) { .fcard { transition: none; } }

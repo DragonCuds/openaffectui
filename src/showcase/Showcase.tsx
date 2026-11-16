@@ -18,10 +18,18 @@ import DemoComposer from './DemoComposer';
 import DemoMessageActions from './DemoMessageActions';
 import DemoToolCall from './DemoToolCall';
 import DemoDiff from './DemoDiff';
+import DemoSentenceCompare from './DemoSentenceCompare';
 import DemoChange from './DemoChange';
 import DemoKpi from './DemoKpi';
 import DemoBreakdown from './DemoBreakdown';
 import DemoRange from './DemoRange';
+import DemoLive from './DemoLive';
+import DemoForms from './DemoForms';
+import DemoHrDay from './DemoHrDay';
+import DemoSleepBar from './DemoSleepBar';
+import DemoDayRows from './DemoDayRows';
+import DemoLanding from './DemoLanding';
+import DemoYara from './DemoYara';
 import './showcase.css';
 
 const GUARDS = [
@@ -89,11 +97,19 @@ export function Showcase() {
       <DemoChat />
       <DemoMessageActions />
       <DemoDiff />
+      <DemoSentenceCompare />
       <DemoToolCall />
       <DemoChange />
       <DemoKpi />
       <DemoBreakdown />
       <DemoRange />
+      <DemoLive />
+      <DemoForms />
+      <DemoHrDay />
+      <DemoSleepBar />
+      <DemoDayRows />
+      <DemoLanding />
+      <DemoYara />
       <Toaster />
     </div>
   );

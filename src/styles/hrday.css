@@ -1,0 +1,26 @@
+.hrday { margin: 0; display: flex; flex-direction: column; gap: var(--s2); inline-size: 100%; }
+.hrday-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
+.hrday-title { font-weight: 500; }
+.hrday-read { color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; min-block-size: 1.4em; }
+.hrday-svg { inline-size: 100%; block-size: auto; display: block; touch-action: pan-y; }
+.hrday-night { fill: color-mix(in srgb, var(--text) 7%, transparent); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.hrday-sleep { fill: var(--accent); }
+.hrday-light { opacity: 0.14; }
+.hrday-rem { opacity: 0.22; }
+.hrday-deep { opacity: 0.32; }
+.hrday-grid { stroke: color-mix(in srgb, var(--text) 9%, transparent); stroke-width: 1; }
+.hrday-tick { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+.hrday-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.hrday-dot { fill: var(--accent); }
+.hrday-raw { fill: var(--accent); opacity: 0.3; }
+.hrday-band { fill: color-mix(in srgb, var(--accent) 10%, transparent); }
+.hrday-note { margin: 0; color: var(--muted); font-size: var(--fs-sm); }
+.hrday-guide { stroke: color-mix(in srgb, var(--text) 25%, transparent); stroke-width: 1; }
+.hrday-mark { fill: var(--panel); stroke: var(--accent); stroke-width: 2.5; }
+.hrday-empty { fill: var(--muted); font-size: 13px; font-family: var(--font); }
+.hrday-legend { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--s4); color: var(--muted); font-size: var(--fs-sm); }
+.hrday-legend li { display: inline-flex; align-items: center; gap: var(--s2); }
+.hrday-sw { display: inline-block; inline-size: 14px; block-size: 14px; border-radius: 4px; }
+.hrday-sw.hrday-night { background: color-mix(in srgb, var(--text) 12%, transparent); }
+.hrday-sw.hrday-sleep { background: var(--accent); opacity: 0.32; }
+.hrday-sw.hrday-band { background: color-mix(in srgb, var(--accent) 22%, transparent); }

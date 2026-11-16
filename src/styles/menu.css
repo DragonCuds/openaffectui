@@ -1,0 +1,29 @@
+/* Menu: a button that opens a short list of actions. Same family as the Select list: tinted panel, shadow, no borders. */
+.menu { position: relative; display: inline-flex; }
+.menu-btn { max-inline-size: 150px; }
+.menu-label { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-btn[aria-expanded='true'] { background: var(--soft-2); }
+.menu-btn svg { transition: transform 0.2s var(--ease, ease); }
+.menu-btn[aria-expanded='true'] svg { transform: rotate(180deg); }
+.menu-pop {
+  position: absolute; inset-block-start: calc(100% + var(--s2)); inset-inline-end: 0; z-index: 30;
+  display: flex; flex-direction: column; gap: var(--s1); min-inline-size: 160px; padding: var(--s1);
+  border-radius: var(--radius-card); background: var(--panel); color: var(--text);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.18), 0 2px 6px rgb(0 0 0 / 0.06);
+  animation: menu-in 0.16s var(--ease, ease) both;
+}
+.menu-top { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s2) var(--s2) var(--s1); }
+.menu-top + .menu-list { padding-block-start: var(--s1); }
+.menu-list { display: flex; flex-direction: column; gap: 2px; }
+.menu-item {
+  display: flex; align-items: center; gap: var(--s2); min-block-size: 38px; padding: var(--s1) var(--s3); border: 0; border-radius: 8px;
+  background: transparent; color: inherit; font: inherit; font-size: var(--fs-md); line-height: 1.6; text-align: start; cursor: pointer;
+  transition: background-color 0.12s var(--ease, ease);
+}
+.menu-item:hover, .menu-item:focus-visible { background: var(--soft); }
+.menu-item:active { background: var(--soft-2); }
+.menu-item:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+:root[data-theme='dark'] .menu-pop { background: var(--soft); box-shadow: 0 16px 40px rgb(0 0 0 / 0.55); }
+:root[data-theme='dark'] .menu-item:hover, :root[data-theme='dark'] .menu-item:focus-visible { background: var(--soft-2); }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .menu-pop { animation: none; } .menu-btn svg { transition: none; } }

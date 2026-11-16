@@ -1,0 +1,21 @@
+/* Fact, FactGrid, StickyBar. No borders: tinted surfaces and soft shadows. */
+.fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.fact { display: flex; align-items: flex-start; gap: var(--s3); padding: var(--s4); border-radius: var(--radius-panel); background: var(--soft); min-inline-size: 0; }
+.fact[data-wide] { grid-column: 1 / -1; }
+.fact-ic { flex: none; display: grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: 12px; background: var(--panel); box-shadow: 0 2px 8px color-mix(in srgb, var(--text) 8%, transparent); }
+.fact-body { display: flex; flex-direction: column; gap: 2px; min-inline-size: 0; flex: 1; }
+.fact-label { font-size: var(--fs-sm); color: var(--muted); }
+.fact-value { font-size: var(--fs-lg); font-weight: 800; line-height: 1.7; text-wrap: balance; }
+.fact-note { font-size: var(--fs-sm); color: var(--muted); line-height: 1.8; }
+@media (max-width: 560px) { .fact-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.sticky-bar {
+  position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 30; display: flex; align-items: center; gap: var(--s3);
+  padding: var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 -6px 24px color-mix(in srgb, var(--text) 10%, transparent);
+}
+@media (min-width: 960px) { .sticky-bar:not([data-always]) { display: none; } }
+@media (min-width: 720px) { .fact-grid[data-cols='3'] { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.fact[data-tone='accent'] .fact-ic { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); color: var(--accent); box-shadow: none; }
+.surface .fact { background: var(--panel); box-shadow: 0 6px 18px -14px color-mix(in srgb, var(--text) 40%, transparent); }
