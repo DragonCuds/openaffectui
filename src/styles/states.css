@@ -6,7 +6,7 @@
 .empty-ic { display: grid; place-items: center; inline-size: 44px; block-size: 44px; border-radius: 50%; background: var(--soft-2); color: var(--muted); margin-block-end: var(--s1); }
 .empty-ic.bad { color: var(--bad); }
 .empty-title { font-weight: 500; }
-.empty .btn:not(.btn-primary) { background: var(--soft-2); }
+.empty .btn:not(.btn-primary):not(.btn-ghost) { background: var(--soft-2); }
 
 @media (prefers-reduced-motion: reduce) {
 }
@@ -17,4 +17,4 @@
 .callout[data-tone='bad'] .callout-t { color: var(--bad); }
 .callout-t { margin: 0; font-weight: 600; }
 .callout-act { display: flex; flex-wrap: wrap; gap: var(--s2); }
-.callout .btn:not(.btn-primary) { background: var(--soft-2); }
+.callout .btn:not(.btn-primary):not(.btn-ghost) { background: var(--soft-2); }

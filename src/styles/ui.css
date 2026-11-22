@@ -82,8 +82,16 @@
 .btn:hover:not(:disabled) { background: var(--soft-2); }
 .btn-primary { background: var(--primary); color: var(--on-primary); }
 .btn-primary:hover:not(:disabled) { background: var(--primary); opacity: 0.86; }
-.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-ghost { background: transparent; padding-inline: var(--s3); }
+.btn-ghost:hover:not(:disabled) { background: var(--soft); }
+.btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+/* off: the same pill, faded (a filled primary turns into a pale pill with a quiet label, not a grey blob) */
+.btn:disabled { opacity: 0.55; cursor: default; }
+.btn-primary:disabled:not([data-loading]) { opacity: 1; background: color-mix(in srgb, var(--primary) 16%, var(--panel)); color: color-mix(in srgb, var(--text) 45%, transparent); }
+.btn-ghost:disabled { opacity: 0.45; }
 .btn[data-loading]:disabled { opacity: 0.8; cursor: progress; }
+.btn-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; gap: var(--s1); max-inline-size: 100%; }
+.btn-reason { font-size: var(--fs-sm); line-height: 1.6; color: var(--muted); padding-inline: var(--s2); }
 .btn[data-loading]::before {
   content: ''; flex: none; inline-size: 14px; block-size: 14px; border-radius: 50%;
   border: 2px solid currentColor; border-inline-end-color: transparent; animation: btn-spin 0.8s linear infinite;
@@ -153,22 +161,24 @@
 }
 .rn-strip > span { display: block; height: 1.5em; }
 
-.seg { display: inline-flex; align-self: flex-start; background: var(--soft); border-radius: 999px; padding: 3px; }
-.seg-track { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.seg { display: inline-flex; align-self: flex-start; max-inline-size: 100%; box-sizing: border-box; background: var(--soft); border-radius: 999px; padding: 3px; }
+.seg-track { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); min-inline-size: 0; }
 .seg-thumb {
   position: absolute; top: 0; bottom: 0;
   width: calc(100% / var(--n));
   inset-inline-start: calc(var(--i) * (100% / var(--n)));
-  background: var(--panel); border-radius: 999px; box-shadow: var(--shadow-sm);
+  background: var(--seg-thumb, var(--panel)); border-radius: 999px; box-shadow: var(--shadow-sm);
   transition: inset-inline-start 0.45s var(--ease);
 }
 .seg-opt {
   position: relative; z-index: 1;
   height: 28px; padding-inline: var(--s4); border: 0; background: none; border-radius: 999px;
-  font-size: var(--fs-md); color: var(--muted); white-space: nowrap;
+  font-size: var(--fs-md); color: var(--muted); white-space: nowrap; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis;
   transition: color 0.2s var(--ease);
 }
 .seg-opt[aria-checked='true'] { color: var(--text); font-weight: 500; }
+/* dark: the chosen option must read as the lit one, so the thumb is lighter than the track (the panel tone is darker than it) */
+:root[data-theme='dark'] .seg { --seg-thumb: var(--soft-2); }
 .seg-opt:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
 .seg[data-size='sm'] { padding: 2px; }
 .seg[data-size='sm'] .seg-opt { height: 26px; padding-inline: var(--s3); font-size: var(--fs-sm); }
@@ -182,7 +192,7 @@
 .seg-thumb[data-tone='bad'] { background: color-mix(in srgb, var(--bad) 20%, var(--panel)); }
 @media (prefers-reduced-motion: reduce) { .seg-thumb { transition: none; } }
 
-.meter { height: 4px; border-radius: 4px; background: var(--soft-2); overflow: hidden; }
+.meter { height: 6px; border-radius: 6px; background: var(--soft-2); overflow: hidden; }
 .meter-fill {
   height: 100%; border-radius: 4px; background: var(--meter-fill, var(--text)); opacity: var(--meter-opacity, 0.8);
   animation: meter-in 0.9s var(--ease) both;
@@ -197,3 +207,13 @@
 @keyframes dot-pulse { 50% { opacity: 0.35; } }
 .dot-warn { background: var(--busy); opacity: 1; }
 .dot-info { background: var(--info, var(--muted)); opacity: 1; }
+
+/* StatNumber: count without a lone zero */
+.statnum { display: inline-flex; flex-direction: column; gap: 2px; min-inline-size: 0; }
+.statnum-big .statnum-v { font-size: 28px; font-weight: 700; line-height: 1.15; }
+.statnum-small { flex-direction: row; align-items: baseline; gap: 6px; }
+.statnum-small .statnum-v { font-weight: 600; }
+.statnum-unit { font-size: .55em; font-weight: 500; margin-inline-start: 4px; opacity: .7; }
+.statnum-label { font-size: 13px; opacity: .7; }
+.statnum.is-empty .statnum-empty { opacity: .6; font-weight: 500; }
+.statnum-big.is-empty .statnum-empty { font-size: 15px; line-height: 1.6; }
